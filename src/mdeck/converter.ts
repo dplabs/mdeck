@@ -58,7 +58,7 @@ const _el = document.createElement('div');
 
 export function convertMarkdown(content: ContentItem[] | undefined, links: Record<string, { href: string; title?: string }> = {}, inline = false): string {
   if (!content || content.length === 0) return '';
-  const env: { links?: Record<string, { href: string; title?: string }> } = { links };
+  const env = buildEnv(links);
   return postProcessHtml(renderContent(content, env), inline);
 }
 
@@ -74,7 +74,7 @@ export async function convertMarkdownAsync(
   renderer?: (markdown: string) => string | null | Promise<string | null>,
 ): Promise<string> {
   if (!content || content.length === 0) return '';
-  const env: { links?: Record<string, { href: string; title?: string }> } = { links };
+  const env = buildEnv(links);
   // When a custom renderer is provided, collect the full raw markdown and pass it through,
   // falling back to the built-in pipeline on null or error.
   if (renderer) {
@@ -102,15 +102,30 @@ export function postProcessHtml(html: string, inline = false): string {
   return html;
 }
 
+type MdEnv = { links?: Record<string, { href: string; title?: string }>; _linkDefs?: string };
+
+/**
+ * Build the markdown-it `env` object from a links map.
+ * Link definitions are serialized as `[id]: url "title"` and prepended to the first
+ * markdown chunk so markdown-it can resolve reference-style links natively.
+ */
+function buildEnv(links: Record<string, { href: string; title?: string }>): MdEnv {
+  const defs = Object.entries(links).map(([k, { href, title }]) =>
+    title ? `[${k}]: ${href} "${title}"\n` : `[${k}]: ${href}\n`
+  ).join('');
+  return { links, _linkDefs: defs };
+}
+
 /**
  * Render content items to final HTML.
  * Block content classes are rendered independently to avoid the CommonMark HTML block
  * type-6 problem: <div> blocks in a markdown stream terminate at the first blank line,
  * which would cut off code blocks inside .left-column/.right-column etc.
  */
-function renderContent(content: ContentItem[], env: { links?: Record<string, { href: string; title?: string }> }): string {
+function renderContent(content: ContentItem[], env: MdEnv, _isRoot = true): string {
   let html = '';
-  let pendingMarkdown = '';
+  // Prepend link definitions on the root call so reference-style links resolve correctly.
+  let pendingMarkdown = (_isRoot && env._linkDefs) ? env._linkDefs : '';
 
   const flushMarkdown = () => {
     if (pendingMarkdown) {
@@ -126,7 +141,7 @@ function renderContent(content: ContentItem[], env: { links?: Record<string, { h
       // Flush any preceding raw markdown before inserting the block div.
       // This prevents the outer md.render() from ever seeing a <div> + blank-line combo.
       flushMarkdown();
-      const innerHtml = renderContent(item.content, env);
+      const innerHtml = renderContent(item.content, env, false);
       html += `<div class="${item.class}">${innerHtml}</div>\n`;
     } else {
       // Inline span: stays in the markdown stream.
