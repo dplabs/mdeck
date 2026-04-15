@@ -2,7 +2,7 @@ import type EventEmitter from 'eventemitter3';
 import type { Slideshow } from '../models/slideshow.js';
 import type { Slide } from '../models/slide.js';
 import type { Scaler } from '../scaler.js';
-import { convertMarkdown } from '../converter.js';
+import { convertMarkdown, convertMarkdownAsync } from '../converter.js';
 import { engine as highlighter } from '../highlighter.js';
 import { addClass } from '../utils.js';
 import { SlideNumber } from '../components/slide-number/slide-number.js';
@@ -111,8 +111,20 @@ function createContentElement(_events: EventEmitter, slideshow: Slideshow, slide
   const element = document.createElement('div');
   if (slide.properties.name) element.id = 'slide-' + slide.properties.name;
   styleContentElement(slideshow, element, slide.properties);
-  element.innerHTML = convertMarkdown(slide.content, slideshow.getLinks());
-  highlightCodeBlocks(element, slideshow);
+
+  const renderer = slideshow.getMarkdownRenderer();
+  if (renderer) {
+    convertMarkdownAsync(slide.content, slideshow.getLinks(), false, renderer).then((html) => {
+      const extras = Array.from(element.childNodes);
+      element.innerHTML = html;
+      highlightCodeBlocks(element, slideshow);
+      extras.forEach((n) => element.appendChild(n));
+    });
+  } else {
+    element.innerHTML = convertMarkdown(slide.content, slideshow.getLinks());
+    highlightCodeBlocks(element, slideshow);
+  }
+
   return element;
 }
 
@@ -133,8 +145,19 @@ function styleContentElement(slideshow: Slideshow, element: HTMLElement, propert
 function createNotesElement(slideshow: Slideshow, notes: unknown[]): HTMLElement {
   const element = document.createElement('div');
   element.className = 'remark-slide-notes';
-  element.innerHTML = convertMarkdown(notes as Parameters<typeof convertMarkdown>[0], slideshow.getLinks());
-  highlightCodeBlocks(element, slideshow);
+
+  const renderer = slideshow.getMarkdownRenderer();
+  if (renderer) {
+    convertMarkdownAsync(notes as Parameters<typeof convertMarkdown>[0], slideshow.getLinks(), false, renderer).then((html) => {
+      element.innerHTML = html;
+      highlightCodeBlocks(element, slideshow);
+      element.dispatchEvent(new CustomEvent('notesRendered'));
+    });
+  } else {
+    element.innerHTML = convertMarkdown(notes as Parameters<typeof convertMarkdown>[0], slideshow.getLinks());
+    highlightCodeBlocks(element, slideshow);
+  }
+
   return element;
 }
 

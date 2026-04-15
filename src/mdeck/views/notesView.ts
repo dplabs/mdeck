@@ -4,6 +4,8 @@ import type { SlideView } from './slideView.js';
 export class NotesView {
   private notesElement!: HTMLElement;
   private notesPreviewElement!: HTMLElement;
+  private currentSlideView: import('./slideView.js').SlideView | null = null;
+  private notesRenderedHandler: (() => void) | null = null;
 
   constructor(events: EventEmitter, private element: HTMLElement, private slideViewsAccessor: () => SlideView[]) {
     this.configureElements();
@@ -15,8 +17,22 @@ export class NotesView {
     const slideView = slideViews[slideIndex];
     const nextSlideView = slideViews[slideIndex + 1];
 
+    // Remove stale listener from any previously tracked slide
+    if (this.currentSlideView && this.notesRenderedHandler) {
+      this.currentSlideView.notesElement.removeEventListener('notesRendered', this.notesRenderedHandler);
+      this.notesRenderedHandler = null;
+    }
+
     this.notesElement.innerHTML = slideView.notesElement.innerHTML;
     this.notesPreviewElement.innerHTML = nextSlideView ? nextSlideView.notesElement.innerHTML : '';
+
+    // If the async renderer hasn't resolved yet, update when it does
+    this.currentSlideView = slideView;
+    this.notesRenderedHandler = () => {
+      this.notesElement.innerHTML = slideView.notesElement.innerHTML;
+      this.notesRenderedHandler = null;
+    };
+    slideView.notesElement.addEventListener('notesRendered', this.notesRenderedHandler, { once: true });
   }
 
   configureElements(): void {
