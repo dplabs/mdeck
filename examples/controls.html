@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>mdeck – controls &amp; keymaps</title>
+  <meta charset="utf-8">
+  <style>
+    /* Key badge styling used in the slides */
+    kbd {
+      display: inline-block;
+      padding: 2px 8px;
+      font-size: 0.85em;
+      font-family: monospace;
+      background: #f5f5f5;
+      border: 1px solid #bbb;
+      border-bottom: 3px solid #bbb;
+      border-radius: 4px;
+      line-height: 1.6;
+      white-space: nowrap;
+    }
+  </style>
+</head>
+<body>
+<textarea id="source">
+class: center, middle
+
+# Controls & Keymaps
+
+### Every way to navigate and control mdeck
+
+---
+
+# Keyboard — Navigation
+
+| Key(s) | Action |
+|---|---|
+| <kbd>→</kbd> <kbd>↓</kbd> <kbd>Page↓</kbd> <kbd>Space</kbd> | Next slide |
+| <kbd>←</kbd> <kbd>↑</kbd> <kbd>Page↑</kbd> <kbd>Shift+Space</kbd> | Previous slide |
+| <kbd>J</kbd> | Next slide (Vim-style) |
+| <kbd>K</kbd> | Previous slide (Vim-style) |
+| <kbd>Home</kbd> | First slide |
+| <kbd>End</kbd> | Last slide |
+
+Type a slide **number** then <kbd>Enter</kbd> to jump directly — e.g. `5` + <kbd>Enter</kbd>.
+
+---
+
+# Keyboard — Modes & overlays
+
+| Key | Action |
+|---|---|
+| <kbd>P</kbd> | Toggle **presenter mode** |
+| <kbd>C</kbd> | **Clone** the slideshow in a new window |
+| <kbd>F</kbd> | Toggle **fullscreen** |
+| <kbd>B</kbd> | Toggle **blackout** (blank the screen) |
+| <kbd>M</kbd> | Toggle **mirrored** mode |
+| <kbd>Esc</kbd> | Close/hide active overlay |
+| <kbd>H</kbd> or <kbd>?</kbd> | Toggle **help** overlay |
+
+---
+
+# Keyboard — Timer
+
+| Key | Action |
+|---|---|
+| <kbd>S</kbd> | Start / pause the **presentation timer** |
+| <kbd>T</kbd> | **Reset** the timer to 00:00 |
+
+The timer is visible in **presenter mode** (<kbd>P</kbd>).
+
+---
+
+# Mouse
+
+| Action | Result |
+|---|---|
+| **Left-click** | Next slide |
+| **Right-click** | Previous slide |
+| **Scroll down** | Next slide |
+| **Scroll up** | Previous slide |
+
+Click navigation is **off by default** — enable it with:
+
+```javascript
+mdeck.createSlideshow({
+  navigation: { click: true }
+});
+```
+
+Scroll navigation is **on by default** — disable it with:
+
+```javascript
+mdeck.createSlideshow({
+  navigation: { scroll: false }
+});
+```
+
+---
+
+# Touch
+
+| Gesture | Result |
+|---|---|
+| **Swipe left** | Next slide |
+| **Swipe right** | Previous slide |
+| **Tap right half** | Next slide |
+| **Tap left half** | Previous slide |
+
+Touch is **on by default** — disable it with:
+
+```javascript
+mdeck.createSlideshow({
+  navigation: { touch: false }
+});
+```
+
+---
+
+# URL / deep linking
+
+The current slide is tracked in the **URL hash**:
+
+```
+https://your-deck.com/#3
+```
+
+- Bookmarking or sharing a URL opens the deck at that slide
+- The hash updates automatically as you navigate
+- Back/forward browser buttons work as expected
+
+---
+
+# Presenter mode
+
+Press <kbd>P</kbd> to open presenter mode in the **same window**.
+
+Press <kbd>C</kbd> to **clone** the slideshow into a second window — both stay in sync via `postMessage`. Use one window on your laptop, show the other on the projector.
+
+Presenter view shows:
+
+- Current slide
+- **Speaker notes** (written after `???` in your Markdown)
+- Preview of the **next slide**
+- Presentation **timer**
+
+---
+
+# Speaker notes syntax
+
+Add notes after `???` — they appear only in presenter mode:
+
+````markdown
+# My slide
+
+Visible content here.
+
+???
+
+These notes are only shown in presenter mode.
+They support **Markdown** too.
+````
+
+---
+
+# Disabling individual controls
+
+Pass a `navigation` object to opt in/out of specific inputs:
+
+```javascript
+mdeck.createSlideshow({
+  navigation: {
+    click:  true,   // left-click = next (off by default)
+    scroll: false,  // mousewheel navigation (on by default)
+    touch:  false,  // swipe/tap (on by default)
+  }
+});
+```
+
+Keyboard shortcuts are always active and cannot be disabled via options.
+
+---
+class: center, middle
+
+# That's all the controls!
+
+Press <kbd>H</kbd> or <kbd>?</kbd> at any time to see the help overlay.
+</textarea>
+
+<script src="../dist/mdeck.umd.cjs"></script>
+<script>
+  mdeck.createSlideshow({
+    navigation: { click: true }
+  });
+</script>
+</body>
+</html>

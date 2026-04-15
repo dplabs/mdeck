@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>mdeck – inline source</title>
+  <meta charset="utf-8">
+</head>
+<body>
+<!--
+  No <textarea id="source"> needed — the Markdown is passed directly as a
+  string via the `source` option. Useful when you:
+    - Generate or fetch slide content dynamically (API, template, user input)
+    - Want to keep the HTML shell completely clean
+    - Build a wrapper app that constructs the deck programmatically
+-->
+
+<script src="../dist/mdeck.umd.cjs"></script>
+<script>
+  const slides = `
+class: center, middle
+
+# Inline Source
+
+### Markdown passed directly via the \`source\` option
+
+---
+
+# How it works
+
+Pass a \`source\` string to \`createSlideshow()\` — no \`<textarea>\` required:
+
+\`\`\`javascript
+const markdown = \`
+# Slide 1
+Content here.
+
+---
+
+# Slide 2
+More content.
+\`;
+
+mdeck.createSlideshow({ source: markdown });
+\`\`\`
+
+---
+
+# When is this useful?
+
+- Fetching Markdown from an **API** or database at runtime
+- **Generating** slide content programmatically (templates, user data)
+- Building a **wrapper app** (editor preview, live reload, CMS)
+- Writing **tests** — render a known string and assert the output
+
+---
+
+# Fetch + render pattern
+
+\`\`\`javascript
+fetch('/api/deck/42')
+  .then(res => res.text())
+  .then(source => mdeck.createSlideshow({ source }));
+\`\`\`
+
+Or with async/await:
+
+\`\`\`javascript
+const res = await fetch('/api/deck/42');
+const source = await res.text();
+mdeck.createSlideshow({ source });
+\`\`\`
+
+---
+
+# All options still apply
+
+Passing \`source\` doesn't disable any other option:
+
+\`\`\`javascript
+mdeck.createSlideshow({
+  source: markdown,          // inline content
+  ratio: '16:9',             // slide aspect ratio
+  highlightStyle: 'monokai', // code theme
+  navigation: {
+    scroll: false            // disable scroll-to-advance
+  }
+});
+\`\`\`
+
+---
+class: center, middle
+
+# That's it!
+
+The deck you're reading right now was built this way.
+  `;
+
+  mdeck.createSlideshow({ source: slides });
+</script>
+</body>
+</html>

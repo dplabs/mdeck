@@ -1,5 +1,4 @@
 import EventEmitter from 'eventemitter3';
-import { engine as highlighter } from './highlighter.js';
 import { convertMarkdown } from './converter.js';
 import { Parser } from './parser.js';
 import { Slideshow, type SlideshowOptions } from './models/slideshow.js';
@@ -7,50 +6,50 @@ import { SlideshowView } from './views/slideshowView.js';
 import { DefaultController } from './controllers/defaultController.js';
 import { Dom } from './dom.js';
 import macros from './macros.js';
-import { version } from './resources.js';
 
+// Re-export extensibility surface
 export { md as markdownIt } from './converter.js';
+export { engine as highlighter } from './highlighter.js';
+export { version } from './resources.js';
+export { default as macros } from './macros.js';
+export type { SlideshowOptions } from './models/slideshow.js';
 
-export class Api {
-  macros = macros;
-  highlighter = highlighter;
-  version = version;
-  dom: Dom;
+const _dom = new Dom();
 
-  constructor(dom?: Dom) {
-    this.dom = dom ?? new Dom();
-  }
+/**
+ * Create and mount a slideshow. If no `source` or `sourceUrl` is provided,
+ * the content of `<textarea id="source">` is used automatically.
+ */
+export function createSlideshow(options: SlideshowOptions = {}, callback?: (slideshow: Slideshow) => void): Slideshow {
+  options = applyDefaults(_dom, options);
 
-  convert(markdown: string): string {
-    const parser = new Parser();
-    const content = parser.parse(markdown || '', macros)[0].content;
-    return convertMarkdown(content, {}, true);
-  }
+  const events = new EventEmitter();
 
-  create(options: SlideshowOptions, callback?: (slideshow: Slideshow) => void): Slideshow {
-    const dom = this.dom;
-    options = applyDefaults(dom, options);
+  const slideshow = new Slideshow(events, _dom, options, (ss) => {
+    const slideshowView = new SlideshowView(events, _dom, options, ss);
+    const controller = (options.controller as DefaultController)
+      || new DefaultController(events, _dom, slideshowView, (options.navigation ?? {}) as Record<string, unknown>);
+    void controller;
+    callback?.(ss);
+  });
 
-    const events = new EventEmitter();
+  return slideshow;
+}
 
-    const slideshow = new Slideshow(events, dom, options, (ss) => {
-      const slideshowView = new SlideshowView(events, dom, options, ss);
-      const controller = (options.controller as DefaultController) || new DefaultController(events, dom, slideshowView, (options.navigation ?? {}) as Record<string, unknown>);
-      void controller;
-      callback?.(ss);
-    });
-
-    return slideshow;
-  }
+/**
+ * Convert a markdown string to HTML (single-slide, inline rendering).
+ */
+export function convert(markdown: string): string {
+  const parser = new Parser();
+  const content = parser.parse(markdown || '', macros)[0].content;
+  return convertMarkdown(content, {}, true);
 }
 
 function applyDefaults(dom: Dom, options: SlideshowOptions): SlideshowOptions {
-  options = options || {};
-
-  if (!('source' in options)) {
+  if (!('source' in options) && !('sourceUrl' in options)) {
     const sourceElement = dom.getElementById('source');
     if (sourceElement) {
-      options.source = unescape(sourceElement.innerHTML);
+      options.source = unescapeHtml((sourceElement as HTMLTextAreaElement).value || sourceElement.innerHTML);
       (sourceElement as HTMLElement).style.display = 'none';
     }
   }
@@ -62,7 +61,7 @@ function applyDefaults(dom: Dom, options: SlideshowOptions): SlideshowOptions {
   return options;
 }
 
-function unescape(source: string): string {
+function unescapeHtml(source: string): string {
   source = source.replace(/&[l|g]t;/g, (m) => m === '&lt;' ? '<' : '>');
   source = source.replace(/&amp;/g, '&');
   source = source.replace(/&quot;/g, '"');

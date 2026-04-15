@@ -1,12 +1,7 @@
-import { Api } from './mdeck/api.js';
 import { styler } from './mdeck/components/styler/styler.js';
 
-const mdeck = new Api();
+export { createSlideshow, convert, markdownIt, highlighter, macros, version } from './mdeck/api.js';
+export type { SlideshowOptions } from './mdeck/api.js';
 
-(window as unknown as Record<string, unknown>).mdeck = mdeck;
-
+// Apply embedded styles when loaded as a browser script
 styler.styleDocument();
-
-export default mdeck;
-export { Api };
-export type { SlideshowOptions } from './mdeck/models/slideshow.js';
