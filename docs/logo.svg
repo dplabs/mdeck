@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 90" width="300" height="90" role="img" aria-label="mdeck logo">
+  <title>mdeck</title>
+
+  <!-- Slide deck: three stacked cards -->
+  <rect x="2"  y="6"  width="76" height="54" rx="5" fill="#dde3eb"/>
+  <rect x="8"  y="12" width="76" height="54" rx="5" fill="#94a3b8"/>
+  <rect x="14" y="18" width="76" height="54" rx="5" fill="#0f172a"/>
+
+  <!-- Content lines on front card -->
+  <!-- Blue title bar -->
+  <rect x="24" y="30" width="40" height="5" rx="2.5" fill="#38bdf8"/>
+  <!-- Gray body lines -->
+  <rect x="24" y="42" width="56" height="3" rx="1.5" fill="#334155"/>
+  <rect x="24" y="50" width="48" height="3" rx="1.5" fill="#334155"/>
+  <rect x="24" y="58" width="36" height="3" rx="1.5" fill="#334155"/>
+
+  <!-- Wordmark -->
+  <text
+    x="108" y="62"
+    font-family="'Helvetica Neue', Helvetica, Arial, sans-serif"
+    font-size="44"
+    font-weight="800"
+    letter-spacing="-1"
+  ><tspan fill="#0f172a">m</tspan><tspan fill="#38bdf8">deck</tspan></text>
+</svg>

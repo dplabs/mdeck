@@ -1,4 +1,6 @@
-# mdeck
+<p align="center">
+  <img src="docs/logo.svg" alt="mdeck" width="300" height="90">
+</p>
 
 A modern, extensible browser-based Markdown slideshow library — built on [Vite](https://vitejs.dev/), [TypeScript](https://www.typescriptlang.org/), and [markdown-it](https://github.com/markdown-it/markdown-it).
 
