@@ -6,6 +6,7 @@ import { SlideshowView } from './views/slideshowView.js';
 import { DefaultController } from './controllers/defaultController.js';
 import { Dom } from './dom.js';
 import macros from './macros.js';
+import { styler } from './components/styler/styler.js';
 
 // Re-export extensibility surface
 export { md as markdownIt } from './converter.js';
@@ -22,6 +23,8 @@ const _dom = new Dom();
  */
 export function createSlideshow(options: SlideshowOptions = {}, callback?: (slideshow: Slideshow) => void): Slideshow {
   options = applyDefaults(_dom, options);
+
+  if (options.highlightStyle) styler.injectHighlightTheme(options.highlightStyle);
 
   const events = new EventEmitter();
 

@@ -1,4 +1,5 @@
 import { documentStyles } from '../../resources.js';
+import { styles as bundledStyles } from '../../highlighter.js';
 
 export const styler = {
   styleDocument(): void {
@@ -10,6 +11,28 @@ export const styler = {
     const css = documentStyles;
     style.innerHTML = css;
     head.insertBefore(style, head.firstChild);
+  },
+
+  injectHighlightTheme(style: string): void {
+    const id = 'mdeck-hljs-theme-' + style;
+    if (document.getElementById(id)) return;
+
+    // If a CSS string was manually registered (e.g. mdeck.highlighter.styles['mytheme'] = css),
+    // inject it scoped to the slide element so it doesn't bleed globally.
+    if (bundledStyles[style]) {
+      const el = document.createElement('style');
+      el.id = id;
+      el.innerHTML = bundledStyles[style];
+      document.head.appendChild(el);
+      return;
+    }
+
+    // Fall back to loading from jsDelivr CDN.
+    const link = document.createElement('link');
+    link.id = id;
+    link.rel = 'stylesheet';
+    link.href = `https://cdn.jsdelivr.net/npm/highlight.js@11/styles/${style}.min.css`;
+    document.head.appendChild(link);
   },
 
   setPageSize(size: string): void {

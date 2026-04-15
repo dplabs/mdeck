@@ -2,15 +2,17 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="keywords" content="mdeck,markdown,slideshow,presentation" />
+    <meta name="keywords" content="remark,remarkjs,markdown,slideshow,presentation" />
     <meta name="description" content="A simple, in-browser, markdown-driven slideshow tool." />
-    <title>mdeck</title>
+    <title>Remark</title>
     <style>
       @import url(https://fonts.googleapis.com/css?family=Droid+Serif);
       @import url(https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz);
       @import url(https://fonts.googleapis.com/css?family=Ubuntu+Mono:400,700,400italic);
 
-      body { font-family: 'Droid Serif'; }
+      body {
+        font-family: 'Droid Serif';
+      }
       h1, h2, h3 {
         font-family: 'Yanone Kaffeesatz';
         font-weight: 400;
@@ -19,37 +21,71 @@
       .remark-slide-content h1 { font-size: 3em; }
       .remark-slide-content h2 { font-size: 2em; }
       .remark-slide-content h3 { font-size: 1.6em; }
-      .footnote { position: absolute; bottom: 3em; }
+      .footnote {
+        position: absolute;
+        bottom: 3em;
+      }
       li p { line-height: 1.25em; }
       .red { color: #fa0000; }
       .large { font-size: 2em; }
-      a, a > code { color: rgb(249, 38, 114); text-decoration: none; }
-      code { background: #e7e8e2; border-radius: 5px; }
+      a, a > code {
+        color: rgb(249, 38, 114);
+        text-decoration: none;
+      }
+      code {
+        background: #e7e8e2;
+        border-radius: 5px;
+      }
       .remark-code, .remark-inline-code { font-family: 'Ubuntu Mono'; }
-      .remark-code-line-highlighted { background-color: #373832; }
-      .pull-left  { float: left;  width: 47%; }
-      .pull-right { float: right; width: 47%; }
-      .pull-right ~ p { clear: both; }
-      #slideshow .slide .content code { font-size: 0.8em; }
-      #slideshow .slide .content pre code { font-size: 0.9em; padding: 15px; }
+      .remark-code-line-highlighted     { background-color: #373832; }
+      .pull-left {
+        float: left;
+        width: 47%;
+      }
+      .pull-right {
+        float: right;
+        width: 47%;
+      }
+      .pull-right ~ p {
+        clear: both;
+      }
+      #slideshow .slide .content code {
+        font-size: 0.8em;
+      }
+      #slideshow .slide .content pre code {
+        font-size: 0.9em;
+        padding: 15px;
+      }
       .inverse {
         background: #272822;
         color: #777872;
         text-shadow: 0 0 20px #333;
       }
-      .inverse h1, .inverse h2 { color: #f3f3f3; line-height: 0.8em; }
-      #slide-inverse .footnote { bottom: 12px; left: 20px; }
+      .inverse h1, .inverse h2 {
+        color: #f3f3f3;
+        line-height: 0.8em;
+      }
+
+      /* Slide-specific styling */
+      #slide-inverse .footnote {
+        bottom: 12px;
+        left: 20px;
+      }
       #slide-how .slides {
         font-size: 0.9em;
         position: absolute;
-        top: 151px;
+        top:  151px;
         right: 140px;
       }
-      #slide-how .slides h3 { margin-top: 0.2em; }
+      #slide-how .slides h3 {
+        margin-top: 0.2em;
+      }
       #slide-how .slides .first, #slide-how .slides .second {
         padding: 1px 20px;
         height: 90px;
         width: 120px;
+        -moz-box-shadow: 0 0 10px #777;
+        -webkit-box-shadow: 0 0 10px #777;
         box-shadow: 0 0 10px #777;
       }
       #slide-how .slides .first {
@@ -59,15 +95,27 @@
         left: 20%;
         z-index: 1;
       }
-      #slide-how .slides .second { position: relative; background: #fff; z-index: 0; }
+      #slide-how .slides .second {
+        position: relative;
+        background: #fff;
+        z-index: 0;
+      }
+
+      /* Two-column layout */
       .left-column {
         color: #777;
         width: 20%;
         height: 92%;
         float: left;
       }
-      .left-column h2:last-of-type, .left-column h3:last-child { color: #000; }
-      .right-column { width: 75%; float: right; padding-top: 1em; }
+        .left-column h2:last-of-type, .left-column h3:last-child {
+          color: #000;
+        }
+      .right-column {
+        width: 75%;
+        float: right;
+        padding-top: 1em;
+      }
     </style>
   </head>
   <body>
@@ -76,8 +124,8 @@ name: inverse
 layout: true
 class: center, middle, inverse
 ---
-# mdeck
-[em-deck]
+#remark
+[ri-mahrk]
 .footnote[Go directly to [project site](https://github.com/gnab/remark)]
 ---
 ## What is it and why should I be using it?
@@ -117,7 +165,7 @@ If your ideal slideshow creation workflow contains any of the following steps:
 
 - Share with and show to everyone
 
-Then mdeck might be perfect for your next .red[*] slideshow!
+Then remark might be perfect for your next.red[*] slideshow!
 
 .footnote[.red[*] You probably want to convert existing slideshows as well]
 ]
@@ -141,7 +189,7 @@ As the slideshow is actually an HTML document, you may:
 
 As the slideshow is contained in a plain file, you may:
 
-- Store it wherever you like; on your computer, hosted from your Dropbox, hosted on Github Pages...
+- Store it wherever you like; on your computer, hosted from your Dropbox, hosted on Github Pages alongside the stuff you're presenting...
 
 - Easily collaborate with others, keeping track of changes using your favourite SCM tool, like Git or Mercurial
 ]
@@ -159,7 +207,7 @@ name: how
 .right-column[
 A Markdown-formatted chunk of text is transformed into individual slides by JavaScript running in the browser:
 
-```markdown
+```remark
 # Slide 1
 This is slide 1
 
@@ -183,7 +231,7 @@ This is slide 2
 Regular Markdown rules apply with only a single exception:
 
   - A line containing three dashes constitutes a new slide
-  (not a horizontal rule, `<hr />`)
+  (not a horizontal rule, `&lt;hr /&gt;`)
 
 Have a look at the [Markdown website](http://daringfireball.net/projects/markdown/) if you're not familiar with Markdown formatting.
 ]
@@ -205,16 +253,19 @@ A simple HTML document is needed for hosting the styles, Markdown and the genera
     </style>
   </head>
   <body>
-    <textarea id="source">
+*    <textarea id="source">
       <!-- Slideshow Markdown -->
     &lt;/textarea&gt;
-    <script src="mdeck.umd.cjs"></script>
+*    <script src="remark.js">
+    </script>
     <script>
-      mdeck.createSlideshow();
+*      var slideshow = remark.create();
     </script>
   </body>
 </html>
 ```
+
+You may download remark to have your slideshow not depend on any online resources, or reference the [latest version](http://remarkjs.com/downloads/remark-latest.min.js) online directly.
 ]
 ---
 template: inverse
@@ -242,7 +293,7 @@ To help out with slide layout and formatting, a few Markdown extensions have bee
 .right-column[
 Initial lines containing key-value pairs are extracted as slide properties:
 
-```markdown
+```remark
 name: agenda
 class: middle, center
 
@@ -258,6 +309,8 @@ Slide properties serve multiple purposes:
 * Using slides as templates using properties `template` and `layout`
 
 * Expansion of `{{ property }}` expressions to property values
+
+See the [complete list](https://github.com/gnab/remark/wiki/Markdown#slide-properties) of slide properties.
 ]
 ---
 .left-column[
@@ -266,9 +319,9 @@ Slide properties serve multiple purposes:
   ### - Content classes
 ]
 .right-column[
-Any occurrences of one or more dotted CSS class names followed by square brackets are replaced with the contents of the brackets with the specified classes applied:
+Any occurences of one or more dotted CSS class names followed by square brackets are replaced with the contents of the brackets with the specified classes applied:
 
-```markdown
+```remark
 .footnote[.red.bold[*] Important footnote]
 ```
 
@@ -288,16 +341,16 @@ Resulting HTML extract:
   ### - Syntax Highlighting
 ]
 .right-column[
-Code blocks can be syntax highlighted by specifying a language from the set of supported languages.
+Code blocks can be syntax highlighted by specifying a language from the set of [supported languages](https://github.com/gnab/remark/wiki/Configuration#highlighting).
 
-Using fenced code blocks you can easily specify the highlighting language:
+Using [GFM](http://github.github.com/github-flavored-markdown/) fenced code blocks you can easily specify highlighting language:
 
 .pull-left[
 
 <pre><code>```javascript
-function add(a, b) {
-  return a + b;
-}
+function add(a, b)
+  return a + b
+end
 ```</code></pre>
 ]
 .pull-right[
@@ -309,39 +362,8 @@ end
 ```</code></pre>
 ]
 
-A number of highlighting styles are available, including several well-known themes from different editors and IDEs.
+A number of highlighting [styles](https://github.com/gnab/remark/wiki/Configuration#highlighting) are available, including several well-known themes from different editors and IDEs.
 
-]
----
-.left-column[
-  ## Markdown extensions
-  ### - Slide properties
-  ### - Content classes
-  ### - Syntax Highlighting
-  ### - markdown-it plugins
-]
-.right-column[
-Because mdeck uses **markdown-it** under the hood, you can extend the Markdown parser with any plugin from the ecosystem:
-
-```javascript
-import { createSlideshow, markdownIt } from 'mdeck';
-import markdownItFootnote from 'markdown-it-footnote';
-
-markdownIt.use(markdownItFootnote);
-
-createSlideshow({ highlightStyle: 'monokai' });
-```
-
-Or in a plain HTML file using the UMD bundle:
-
-```html
-<script src="mdeck.umd.cjs"></script>
-<script src="markdown-it-footnote.js"></script>
-<script>
-  mdeck.markdownIt.use(markdownItFootnote);
-  mdeck.createSlideshow();
-</script>
-```
 ]
 ---
 .left-column[
@@ -370,7 +392,7 @@ three question marks separate slide content from slide notes:
 ```
 Slide 1 content
 
-???
+*???
 
 Slide 1 notes
 
@@ -378,7 +400,7 @@ Slide 1 notes
 
 Slide 2 content
 
-???
+*???
 
 Slide 2 notes
 ```
@@ -423,19 +445,11 @@ template: inverse
 .right-column[
 Getting up and running is done in only a few steps:
 
-1. Install mdeck: `npm install mdeck`
+1. Visit the [project site](http://github.com/gnab/remark)
 
-2. Import it in your HTML:
+2. Follow the steps in the Getting Started section
 
-```html
-<script src="node_modules/mdeck/dist/mdeck.umd.cjs"></script>
-```
-
-3. Write your slides in a `<textarea id="source">` and call:
-
-```javascript
-mdeck.createSlideshow();
-```
+For more information on using remark, please check out the [wiki](https://github.com/gnab/remark/wiki) pages.
 ]
 ---
 name: last-page
@@ -443,13 +457,28 @@ template: inverse
 
 ## That's all folks (for now)!
 
-Slideshow created using [mdeck](https://github.com/gnab/remark).
+Slideshow created using [remark](http://github.com/gnab/remark).
     </textarea>
     <script src="../dist/mdeck.umd.cjs"></script>
     <script>
+      // Register the custom 'remark' language originally shipped as remark.language.js
+      // on remarkjs.com — needed to highlight the ```remark fenced code blocks.
+      mdeck.highlighter.registerLanguage('remark', function () {
+        return {
+          contains: [
+            { className: 'keyword', begin: '^#+[^\n]+', relevance: 10 },
+            { className: 'comment', begin: '^---?' },
+            { className: 'string',  begin: '^\\w+:' },
+            { className: 'literal', begin: '\\{\\{', end: '\\}\\}' },
+            { className: 'string',  begin: '\\.\\w+' }
+          ]
+        };
+      });
+
       mdeck.createSlideshow({
         highlightStyle: 'monokai',
-        highlightLines: true,
+        highlightLanguage: 'remark',
+        highlightLines: true
       });
     </script>
   </body>

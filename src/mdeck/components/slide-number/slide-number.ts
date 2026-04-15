@@ -7,7 +7,11 @@ export class SlideNumber {
   constructor(slide: Slide, slideshow: Slideshow) {
     this.element = document.createElement('div');
     this.element.className = 'remark-slide-number';
-    this.element.innerHTML = formatSlideNumber(slide, slideshow);
+    if (slideshow.getShowSlideNumber()) {
+      this.element.innerHTML = formatSlideNumber(slide, slideshow);
+    } else {
+      this.element.style.display = 'none';
+    }
   }
 }
 

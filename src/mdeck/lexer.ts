@@ -20,7 +20,11 @@ const regexByName: Record<string, RegExp> = {
   CODE: /(?:^|\n\n)( {4}[^\n]+\n*)+/,
   INLINE_CODE: /`([^`].*?)`/,
   CONTENT: /(?:\\)?((?:\.[a-zA-Z_\-][a-zA-Z\-_0-9]*)+)\[/,
-  FENCES: new RegExp('(?:^|\\n) *(`{3,}|~{3,}) *(?:\\S+)? *\\n(?:[\\s\\S]+?)\\s*\\1 *(?:\\n+|$)'),
+  // Note: `\1` backreference cannot be used here because this pattern is combined
+  // into a larger alternation regex where group numbering shifts. We match any
+  // closing fence (3+ backticks or tildes) instead of requiring it to match the
+  // opening character exactly — correct for all practical cases.
+  FENCES: new RegExp('(?:^|\\n) *(`{3,}|~{3,}) *(?:\\S+)? *\\n(?:[\\s\\S]+?)\\s*(?:`{3,}|~{3,}) *(?:\\n+|$)'),
   DEF: /(?:^|\n) *\[([^\]]+)\]: *<?([^\s>]+)>?(?: +["(]([^\n]+)[")])? *(?:\n+|$)/,
   MACRO: /!\[:([^\] ]+)([^\]]*)\](?:\(([^\)]*)\))?/,
   SLIDE_SEPARATOR: /(?:^|\n)(---|<!--\s*break\s*-->)(?:\n|$)/,

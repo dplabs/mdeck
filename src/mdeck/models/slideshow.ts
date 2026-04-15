@@ -17,8 +17,10 @@ export interface SlideshowOptions {
   highlightInlineCode?: boolean;
   highlightLanguage?: string;
   slideNumberFormat?: string | ((current: number, total: number) => string);
+  showSlideNumber?: boolean;
   cloneTarget?: string;
   createClone?: () => Window | null;
+  markdownRenderer?: (markdown: string) => string | null | Promise<string | null>;
   navigation?: Record<string, unknown>;
   controller?: unknown;
   countIncrementalSlides?: boolean;
@@ -87,7 +89,9 @@ export class Slideshow {
   getHighlightInlineCode(): boolean { return this._options.highlightInlineCode ?? false; }
   getHighlightLanguage(): string { return this._options.highlightLanguage ?? ''; }
   getSlideNumberFormat(): string | ((current: number, total: number) => string) { return this._options.slideNumberFormat ?? '%current% / %total%'; }
+  getShowSlideNumber(): boolean { return this._options.showSlideNumber !== false; }
   getCloneTarget(): string { return this._options.cloneTarget ?? '_blank'; }
+  getMarkdownRenderer(): ((markdown: string) => string | null | Promise<string | null>) | undefined { return this._options.markdownRenderer; }
 
   private _loadFromString(source: string): void {
     this._slides = createSlides(source, this._options);
@@ -156,7 +160,7 @@ function createSlides(source: string, options: SlideshowOptions): Slide[] {
       byNumber[slideNumber] = [];
     }
 
-    if (!options.includePresenterNotes) {
+    if (options.includePresenterNotes === false) {
       parsedSlide.notes = undefined;
     }
 
