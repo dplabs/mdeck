@@ -1,7 +1,7 @@
 import EventEmitter from 'eventemitter3';
-import type { Slideshow } from '../slideshow.js';
+import type { Slideshow, SlideshowOptions } from '../slideshow.js';
 
-export function applyNavigation(self: Slideshow, events: EventEmitter): void {
+export function applyNavigation(self: Slideshow, events: EventEmitter, options: SlideshowOptions = {}): void {
   let currentSlideIndex = -1;
   let started: boolean | null = null;
 
@@ -29,7 +29,9 @@ export function applyNavigation(self: Slideshow, events: EventEmitter): void {
   });
 
   events.on('createClone', () => {
-    if (!self.clone || (self.clone as Window).closed) {
+    if (options.createClone) {
+      self.clone = options.createClone();
+    } else if (!self.clone || (self.clone as Window).closed) {
       self.clone = window.open(location.href, self.getCloneTarget(), 'location=no');
     } else {
       (self.clone as Window).focus();

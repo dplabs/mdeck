@@ -18,6 +18,7 @@ export interface SlideshowOptions {
   highlightLanguage?: string;
   slideNumberFormat?: string | ((current: number, total: number) => string);
   cloneTarget?: string;
+  createClone?: () => Window | null;
   navigation?: Record<string, unknown>;
   controller?: unknown;
   countIncrementalSlides?: boolean;
@@ -50,7 +51,7 @@ export class Slideshow {
 
   constructor(private _events: EventEmitter, private _dom: Dom, private _options: SlideshowOptions, callback?: (slideshow: Slideshow) => void) {
     applyEvents(this, _events);
-    applyNavigation(this, _events);
+    applyNavigation(this, _events, _options);
 
     if (_options.sourceUrl) {
       this._loadFromUrl(_options.sourceUrl, callback);
@@ -76,6 +77,7 @@ export class Slideshow {
   toggleMirrored() { this._events.emit('toggleMirrored'); }
   toggleFullscreen() { this._events.emit('toggleFullscreen'); }
   createClone() { this._events.emit('createClone'); }
+  toggleTimer() { this._events.emit('toggleTimer'); }
   resetTimer() { this._events.emit('resetTimer'); }
 
   getRatio(): string { return this._options.ratio ?? '4:3'; }
