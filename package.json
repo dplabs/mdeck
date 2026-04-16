@@ -1,6 +1,6 @@
 {
 	"name": "mdeck",
-	"version": "0.16.0",
+	"version": "0.16.1",
 	"description": "A modern Markdown slideshow library, compatible with remark slide decks",
 	"type": "module",
 	"main": "./dist/mdeck.umd.cjs",
