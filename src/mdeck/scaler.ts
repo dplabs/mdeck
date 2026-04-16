@@ -3,7 +3,6 @@ import type { Slideshow } from './models/slideshow.js';
 
 const referenceWidth = 908;
 const referenceHeight = 681;
-const referenceRatio = referenceWidth / referenceHeight;
 
 interface Ratio { width: number; height: number; ratio: number }
 interface Dimensions { width: number; height: number }
@@ -51,7 +50,7 @@ function getRatio(slideshow: Slideshow): Ratio {
 
 function getDimensions(ratio: Ratio): Dimensions {
   return {
-    width: Math.floor(referenceWidth / referenceRatio * ratio.ratio),
+    width: Math.floor(referenceHeight * ratio.ratio),
     height: referenceHeight,
   };
 }
