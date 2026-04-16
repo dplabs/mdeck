@@ -29,7 +29,6 @@ export type MacroMap = Record<string, MacroFn>;
 
 export class Parser {
   parse(src: string, macros: MacroMap = {}, options: ParserOptions = {}): ParsedSlide[] {
-    const self = this;
     const lexer = new Lexer();
     const tokens = lexer.lex(cleanInput(src));
     const slides: ParsedSlide[] = [];
@@ -54,7 +53,7 @@ export class Parser {
           }
           const value = macro.apply(token.obj, token.args);
           if (typeof value === 'string') {
-            const parsed = self.parse(value, macros);
+            const parsed = this.parse(value, macros);
             appendTo(stack[stack.length - 1], parsed[0].content[0]);
           } else {
             appendTo(stack[stack.length - 1], value === undefined ? '' : String(value));
@@ -118,7 +117,7 @@ function extractProperties(source: string, properties: Record<string, string>): 
   const propertyFinder = /^\n*([-\w]+):([^$\n]*)|\n*(?:<!--\s*)([-\w]+):([^$\n]*?)(?:\s*-->)/i;
   let match: RegExpExecArray | null;
   while ((match = propertyFinder.exec(source)) !== null) {
-    source = source.substr(0, match.index) + source.substr(match.index + match[0].length);
+    source = source.slice(0, match.index) + source.slice(match.index + match[0].length);
     if (match[1] !== undefined) {
       properties[match[1].trim()] = match[2].trim();
     } else {

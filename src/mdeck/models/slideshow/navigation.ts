@@ -83,7 +83,7 @@ export function applyNavigation(self: Slideshow, events: EventEmitter, options: 
     if (slideNo.toString() === slideNoOrName) return slideNo - 1;
     if (/^p\d+$/.test(slideNoOrName)) {
       events.emit('forcePresenterMode');
-      return parseInt(slideNoOrName.substr(1), 10) - 1;
+      return parseInt(slideNoOrName.slice(1), 10) - 1;
     }
     const slide = self.getSlideByName(slideNoOrName);
     if (slide) return slide.getSlideIndex();

@@ -1,6 +1,7 @@
 import documentStyles from '../styles/mdeck.css?raw';
+import pkg from '../../package.json';
 
-export const version = '1.0.0';
+export const version = pkg.version;
 export { documentStyles };
 
 export const containerLayout = `<div class="remark-notes-area">

@@ -44,15 +44,9 @@ export const styler = {
 };
 
 function getRemarkStylesheet(): CSSStyleSheet | undefined {
-  for (let i = 0; i < document.styleSheets.length; i++) {
-    if (document.styleSheets[i].title === 'remark') return document.styleSheets[i];
-  }
-  return undefined;
+  return Array.from(document.styleSheets).find((s) => s.title === 'remark');
 }
 
 function getPageRule(stylesheet: CSSStyleSheet): CSSRule | undefined {
-  for (let i = 0; i < stylesheet.cssRules.length; i++) {
-    if (stylesheet.cssRules[i] instanceof CSSPageRule) return stylesheet.cssRules[i];
-  }
-  return undefined;
+  return Array.from(stylesheet.cssRules).find((r) => r instanceof CSSPageRule);
 }

@@ -7,7 +7,7 @@ import { Scaler } from '../scaler.js';
 import { containerLayout } from '../resources.js';
 import { printing } from '../components/printing/printing.js';
 import { Timer } from '../components/timer/timer.js';
-import { toggleClass, addClass, removeClass, hasClass, getPrefixedProperty } from '../utils.js';
+import { getPrefixedProperty } from '../utils.js';
 
 export class SlideshowView {
   containerElement!: HTMLElement;
@@ -37,38 +37,38 @@ export class SlideshowView {
     events.on('slidesChanged', () => this.updateSlideViews());
 
     events.on('hideSlide', (slideIndex: number) => {
-      Array.from(this.elementArea.getElementsByClassName('remark-fading')).forEach((s) => removeClass(s as HTMLElement, 'remark-fading'));
+      Array.from(this.elementArea.getElementsByClassName('remark-fading')).forEach((s) => (s as HTMLElement).classList.remove('remark-fading'));
       this.hideSlide(slideIndex);
     });
 
     events.on('showSlide', (slideIndex: number) => this.showSlide(slideIndex));
 
     events.on('forcePresenterMode', () => {
-      if (!hasClass(this.containerElement, 'remark-presenter-mode')) {
-        toggleClass(this.containerElement, 'remark-presenter-mode');
+      if (!this.containerElement.classList.contains('remark-presenter-mode')) {
+        this.containerElement.classList.toggle('remark-presenter-mode');
         this.scaleElements();
         printing.setPageOrientation('landscape');
       }
     });
 
     events.on('togglePresenterMode', () => {
-      toggleClass(this.containerElement, 'remark-presenter-mode');
+      this.containerElement.classList.toggle('remark-presenter-mode');
       this.scaleElements();
       events.emit('toggledPresenter', this.slideshow.getCurrentSlideIndex() + 1);
-      printing.setPageOrientation(hasClass(this.containerElement, 'remark-presenter-mode') ? 'portrait' : 'landscape');
+      printing.setPageOrientation(this.containerElement.classList.contains('remark-presenter-mode') ? 'portrait' : 'landscape');
     });
 
-    events.on('toggleHelp', () => toggleClass(this.containerElement, 'remark-help-mode'));
-    events.on('toggleBlackout', () => toggleClass(this.containerElement, 'remark-blackout-mode'));
-    events.on('toggleMirrored', () => toggleClass(this.containerElement, 'remark-mirrored-mode'));
+    events.on('toggleHelp', () => this.containerElement.classList.toggle('remark-help-mode'));
+    events.on('toggleBlackout', () => this.containerElement.classList.toggle('remark-blackout-mode'));
+    events.on('toggleMirrored', () => this.containerElement.classList.toggle('remark-mirrored-mode'));
 
     events.on('hideOverlay', () => {
-      removeClass(this.containerElement, 'remark-blackout-mode');
-      removeClass(this.containerElement, 'remark-help-mode');
+      this.containerElement.classList.remove('remark-blackout-mode');
+      this.containerElement.classList.remove('remark-help-mode');
     });
 
-    events.on('pause', () => toggleClass(this.containerElement, 'remark-pause-mode'));
-    events.on('resume', () => toggleClass(this.containerElement, 'remark-pause-mode'));
+    events.on('pause', () => this.containerElement.classList.toggle('remark-pause-mode'));
+    events.on('resume', () => this.containerElement.classList.toggle('remark-pause-mode'));
 
     this.handleFullscreen();
   }
@@ -79,10 +79,10 @@ export class SlideshowView {
 
   configureContainerElement(element: HTMLElement): void {
     this.containerElement = element;
-    addClass(element, 'remark-container');
+    element.classList.add('remark-container');
 
     if (element === this.dom.getBodyElement()) {
-      addClass(this.dom.getHTMLElement(), 'remark-container');
+      this.dom.getHTMLElement().classList.add('remark-container');
       forwardEvents(this.events, window, ['hashchange', 'resize', 'keydown', 'keypress', 'mousewheel', 'message', 'DOMMouseScroll']);
       forwardEvents(this.events, element, ['touchstart', 'touchmove', 'touchend', 'click', 'contextmenu']);
     } else {
