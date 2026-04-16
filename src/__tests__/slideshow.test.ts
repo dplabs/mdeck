@@ -21,6 +21,40 @@ function makeDom(): Dom {
   } as unknown as Dom;
 }
 
+/** Build a Dom whose XHR automatically resolves each URL to a given content map. */
+function makeDomWithUrls(urlMap: Record<string, string>): Dom {
+  const XHRMock = class {
+    url = '';
+    readyState = 0;
+    status = 0;
+    responseText = '';
+    onload?: () => void;
+    onerror?: () => void;
+    open(_method: string, url: string) { this.url = url; }
+    send() {
+      // Resolve asynchronously so Promise.all works correctly
+      Promise.resolve().then(() => {
+        if (this.url in urlMap) {
+          this.readyState = 4;
+          this.status = 200;
+          this.responseText = urlMap[this.url];
+          this.onload?.();
+        } else {
+          this.onerror?.();
+        }
+      });
+    }
+  };
+  return {
+    getHTMLElement: () => document.documentElement,
+    getBodyElement: () => document.body as HTMLBodyElement,
+    getElementById: () => null,
+    getLocationHash: () => '',
+    setLocationHash: () => {},
+    XMLHttpRequest: XHRMock as unknown as typeof XMLHttpRequest,
+  } as unknown as Dom;
+}
+
 describe('Slideshow', () => {
   let events: EventEmitter;
   let slideshow: Slideshow;
@@ -247,6 +281,76 @@ describe('Slideshow', () => {
 
     it('getHighlightSpans defaults to false', () => {
       expect(slideshow.getHighlightSpans()).toBe(false);
+    });
+  });
+
+  describe('sourceUrls (issue #7)', () => {
+    it('loads and concatenates multiple URLs in order', async () => {
+      const urlDom = makeDomWithUrls({
+        'a.md': '# Slide A',
+        'b.md': '# Slide B',
+        'c.md': '# Slide C',
+      });
+      let ss!: Slideshow;
+      await new Promise<void>((resolve) => {
+        ss = new Slideshow(new EventEmitter(), urlDom, { sourceUrls: ['a.md', 'b.md', 'c.md'] }, () => resolve());
+      });
+      expect(ss.getSlideCount()).toBe(3);
+    });
+
+    it('creates the correct number of slides from multiple URLs', async () => {
+      const urlDom = makeDomWithUrls({
+        'intro.md': '# Intro',
+        'chapter.md': '# Chapter 1\n---\n# Chapter 2',
+      });
+      let ss!: Slideshow;
+      await new Promise<void>((resolve) => {
+        ss = new Slideshow(events, urlDom, { sourceUrls: ['intro.md', 'chapter.md'] }, () => resolve());
+      });
+      expect(ss.getSlideCount()).toBe(3);
+    });
+
+    it('preserves content from each URL', async () => {
+      const urlDom = makeDomWithUrls({
+        'part1.md': 'First',
+        'part2.md': 'Second',
+      });
+      let ss!: Slideshow;
+      await new Promise<void>((resolve) => {
+        ss = new Slideshow(events, urlDom, { sourceUrls: ['part1.md', 'part2.md'] }, () => resolve());
+      });
+      const content = ss.getSlides().map((s) => s.content.join(''));
+      expect(content.some((c) => c.includes('First'))).toBe(true);
+      expect(content.some((c) => c.includes('Second'))).toBe(true);
+    });
+
+    it('loadFromUrls works as a public method', async () => {
+      const urlDom = makeDomWithUrls({
+        'x.md': '# X',
+        'y.md': '# Y',
+      });
+      let ss!: Slideshow;
+      await new Promise<void>((resolve) => {
+        ss = new Slideshow(events, urlDom, {});
+        ss.loadFromUrls(['x.md', 'y.md'], () => resolve());
+      });
+      expect(ss.getSlideCount()).toBe(2);
+    });
+
+    it('sourceUrls takes precedence over sourceUrl when both provided', async () => {
+      const urlDom = makeDomWithUrls({
+        'single.md': '# Single',
+        'multi1.md': '# Multi 1',
+        'multi2.md': '# Multi 2',
+      });
+      let ss!: Slideshow;
+      await new Promise<void>((resolve) => {
+        ss = new Slideshow(events, urlDom, {
+          sourceUrl: 'single.md',
+          sourceUrls: ['multi1.md', 'multi2.md'],
+        }, () => resolve());
+      });
+      expect(ss.getSlideCount()).toBe(2);
     });
   });
 });
