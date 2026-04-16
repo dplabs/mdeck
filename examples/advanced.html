@@ -3,26 +3,47 @@
 <head>
   <title>mdeck – advanced: custom markup</title>
   <meta charset="utf-8">
+  <link rel="stylesheet" href="styles/theme.css">
   <style>
-    /* Example: custom .highlight class */
-    .highlight { background: #fff176; padding: 0 4px; border-radius: 3px; }
+    /* Example: custom .highlight inline class */
+    .highlight {
+      background: #fef9c3;
+      color: #713f12;
+      padding: 0.05em 0.35em;
+      border-radius: 4px;
+    }
 
     /* Example: custom .warning callout block */
     .warning {
-      border-left: 4px solid #f44336;
-      background: #fff3f3;
-      padding: 0.6em 1em;
-      border-radius: 0 4px 4px 0;
-      margin: 1em 0;
+      border-left: 4px solid #ef4444;
+      background: #fff5f5;
+      padding: 0.65em 1.1em;
+      border-radius: 0 6px 6px 0;
+      margin: 0.9em 0;
+      color: #7f1d1d;
     }
 
     /* Example: custom .tip callout block */
     .tip {
-      border-left: 4px solid #4caf50;
-      background: #f3fff3;
-      padding: 0.6em 1em;
-      border-radius: 0 4px 4px 0;
-      margin: 1em 0;
+      border-left: 4px solid #22c55e;
+      background: #f0fdf4;
+      padding: 0.65em 1.1em;
+      border-radius: 0 6px 6px 0;
+      margin: 0.9em 0;
+      color: #14532d;
+    }
+
+    /* Example: custom .badge span injected via macro */
+    .badge {
+      display: inline-block;
+      background: #6366f1;
+      color: #fff;
+      border-radius: 12px;
+      padding: 0.15em 0.75em;
+      font-size: 0.72em;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      vertical-align: middle;
     }
   </style>
 </head>

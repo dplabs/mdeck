@@ -1,0 +1,193 @@
+/* mdeck example theme — shared across all non-compat examples */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:ital,wght@0,400;0,500;1,400&display=swap');
+
+/* ── Outer container ─────────────────────────────────────────────────── */
+.remark-container,
+.mdeck-container {
+  background: #0f0f1a;
+}
+
+/* ── Slide content ────────────────────────────────────────────────────── */
+.remark-slide-content,
+.mdeck-slide-content {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  background: #ffffff;
+  color: #1c1c2e;
+  padding: 1.5em 3.5em;
+  line-height: 1.6;
+}
+
+/* ── Headings ─────────────────────────────────────────────────────────── */
+.remark-slide-content h1,
+.mdeck-slide-content h1 {
+  font-weight: 700;
+  color: #1c1c2e;
+  letter-spacing: -0.025em;
+  padding-bottom: 0.25em;
+  border-bottom: 3px solid #6366f1;
+  margin-bottom: 0.6em;
+}
+
+.remark-slide-content h2,
+.mdeck-slide-content h2 {
+  font-weight: 600;
+  color: #2d2d5e;
+}
+
+.remark-slide-content h3,
+.mdeck-slide-content h3 {
+  font-weight: 500;
+  color: #6366f1;
+}
+
+/* Drop the h1 underline on title (centered) slides */
+.remark-slide-content.center h1,
+.mdeck-slide-content.center h1 {
+  border-bottom: none;
+}
+
+/* ── Links ────────────────────────────────────────────────────────────── */
+.remark-slide-content a,
+.mdeck-slide-content a {
+  color: #6366f1;
+  text-decoration: none;
+  border-bottom: 1px solid rgba(99, 102, 241, 0.35);
+}
+
+.remark-slide-content a:hover,
+.mdeck-slide-content a:hover {
+  border-bottom-color: #6366f1;
+}
+
+/* ── Inline code ──────────────────────────────────────────────────────── */
+.remark-slide-content code,
+.mdeck-slide-content code {
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  background: #f0f0ff;
+  color: #5b5bd6;
+  padding: 0.1em 0.45em;
+  border-radius: 4px;
+  font-size: 0.88em;
+}
+
+/* ── Code blocks ──────────────────────────────────────────────────────── */
+.remark-code,
+.mdeck-code {
+  font-family: 'JetBrains Mono', 'Fira Code', monospace !important;
+  font-size: 0.82em !important;
+  border-radius: 10px;
+  padding: 1em 1.25em !important;
+}
+
+.remark-slide-content pre,
+.mdeck-slide-content pre {
+  margin: 0.75em 0;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+/* Reset inline code style inside a code block */
+.remark-slide-content pre code,
+.mdeck-slide-content pre code {
+  background: transparent;
+  color: inherit;
+  padding: 0;
+  font-size: inherit;
+  border-radius: 0;
+}
+
+/* ── Lists ────────────────────────────────────────────────────────────── */
+.remark-slide-content ul,
+.remark-slide-content ol,
+.mdeck-slide-content ul,
+.mdeck-slide-content ol {
+  padding-left: 1.6em;
+}
+
+.remark-slide-content li,
+.mdeck-slide-content li {
+  margin: 0.35em 0;
+  line-height: 1.65;
+}
+
+/* ── Tables ───────────────────────────────────────────────────────────── */
+.remark-slide-content table,
+.mdeck-slide-content table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 0.9em 0;
+  font-size: 0.9em;
+}
+
+.remark-slide-content th,
+.mdeck-slide-content th {
+  background: #6366f1;
+  color: #ffffff;
+  padding: 0.55em 1em;
+  text-align: left;
+  font-weight: 600;
+  font-size: 0.9em;
+  letter-spacing: 0.02em;
+}
+
+.remark-slide-content td,
+.mdeck-slide-content td {
+  padding: 0.5em 1em;
+  border-bottom: 1px solid #e8e8f8;
+  vertical-align: middle;
+}
+
+.remark-slide-content tr:last-child td,
+.mdeck-slide-content tr:last-child td {
+  border-bottom: none;
+}
+
+.remark-slide-content tr:nth-child(even) td,
+.mdeck-slide-content tr:nth-child(even) td {
+  background: #f8f8ff;
+}
+
+/* ── Slide number ─────────────────────────────────────────────────────── */
+.remark-slide-number,
+.mdeck-slide-number {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.72em;
+  color: #a0a0c0;
+  opacity: 1;
+}
+
+/* ── Blockquotes ──────────────────────────────────────────────────────── */
+.remark-slide-content blockquote,
+.mdeck-slide-content blockquote {
+  border-left: 4px solid #6366f1;
+  margin: 1em 0;
+  padding: 0.5em 1.1em;
+  background: #f5f5ff;
+  color: #3a3a7a;
+  border-radius: 0 6px 6px 0;
+  font-style: italic;
+}
+
+/* ── kbd elements ─────────────────────────────────────────────────────── */
+.remark-slide-content kbd,
+.mdeck-slide-content kbd {
+  display: inline-block;
+  padding: 0.15em 0.55em;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.82em;
+  color: #1c1c2e;
+  background: #f5f5ff;
+  border: 1px solid #c4c4e0;
+  border-bottom: 3px solid #9090c0;
+  border-radius: 5px;
+  line-height: 1.5;
+  white-space: nowrap;
+  box-shadow: 0 1px 0 #c4c4e0;
+}
+
+/* ── strong ───────────────────────────────────────────────────────────── */
+.remark-slide-content strong,
+.mdeck-slide-content strong {
+  font-weight: 700;
+  color: #1c1c2e;
+}
