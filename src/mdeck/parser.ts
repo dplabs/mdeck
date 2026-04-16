@@ -114,18 +114,39 @@ function appendTo(element: ParsedSlide | ContentClass, content: ContentItem): vo
 }
 
 function extractProperties(source: string, properties: Record<string, string>): string {
-  const propertyFinder = /^\n*([-\w]+):([^$\n]*)|\n*(?:<!--\s*)([-\w]+):([^$\n]*?)(?:\s*-->)/i;
+  if (typeof source !== 'string') return source as unknown as string;
+
+  // Extract inline HTML comment properties anywhere in the source (they are invisible markers).
+  const commentFinder = /\n*(?:<!--\s*)([-\w]+):([^$\n]*?)(?:\s*-->)/gi;
   let match: RegExpExecArray | null;
-  while ((match = propertyFinder.exec(source)) !== null) {
+  while ((match = commentFinder.exec(source)) !== null) {
     source = source.slice(0, match.index) + source.slice(match.index + match[0].length);
-    if (match[1] !== undefined) {
-      properties[match[1].trim()] = match[2].trim();
-    } else {
-      properties[match[3].trim()] = match[4].trim();
-    }
-    propertyFinder.lastIndex = match.index;
+    properties[match[1].trim()] = match[2].trim();
+    commentFinder.lastIndex = match.index;
   }
-  return source;
+
+  // Extract plain `key: value` properties only from the leading front-matter block.
+  // Stop as soon as a line that is not a property (or blank) is encountered so that
+  // content lines like "Example: this disappears" are never consumed as properties.
+  const lines = source.split('\n');
+  const consumed: number[] = [];
+  const propertyLine = /^([-\w]+):([^$\n]*)$/i;
+  let i = 0;
+  // Skip leading blank lines.
+  while (i < lines.length && lines[i].trim() === '') { i++; }
+  // Consume contiguous property lines.
+  while (i < lines.length) {
+    const line = lines[i];
+    if (line.trim() === '') break; // blank line ends the front-matter block
+    const m = propertyLine.exec(line);
+    if (!m) break; // non-property line ends the block
+    properties[m[1].trim()] = m[2].trim();
+    consumed.push(i);
+    i++;
+  }
+  // Remove consumed lines from source.
+  const remaining = lines.filter((_, idx) => !consumed.includes(idx));
+  return remaining.join('\n');
 }
 
 function cleanInput(source: string): string {

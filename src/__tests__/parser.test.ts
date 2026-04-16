@@ -197,7 +197,36 @@ describe('Parser', () => {
     });
 
     it('removes extracted properties from content', () => {
-      expect(parser.parse('name: a\n1')[0].content).toEqual(['\n1']);
+      expect(parser.parse('name: a\n1')[0].content).toEqual(['1']);
+    });
+
+    it('does not consume a word:value line that appears after other content (issue #4)', () => {
+      // "Example: this line disappears" appears after real content — must stay as content.
+      const slide = parser.parse('# Heading\n\nExample: this line disappears\n\nMore content.')[0];
+      expect(slide.properties['Example']).toBeUndefined();
+      expect(slide.content.join('')).toContain('Example: this line disappears');
+    });
+
+    it('does not consume a word:value line mixed in with regular content', () => {
+      const slide = parser.parse('Some intro\n\nNote: this should stay\n\nMore text')[0];
+      expect(slide.properties['Note']).toBeUndefined();
+      expect(slide.content.join('')).toContain('Note: this should stay');
+    });
+
+    it('stops extracting properties at the first non-property line', () => {
+      // "name" is a valid property but the next line is not, so class:b further down stays as content.
+      const slide = parser.parse('name: a\nNot valid prop\nclass: b')[0];
+      expect(slide.properties.name).toBe('a');
+      expect(slide.properties.class).toBeUndefined();
+      expect(slide.content.join('')).toContain('class: b');
+    });
+
+    it('stops extracting properties at a blank line separating front-matter from content', () => {
+      const slide = parser.parse('name: a\n\nclass: b')[0];
+      expect(slide.properties.name).toBe('a');
+      // class: b is after a blank line — it is content, not a property
+      expect(slide.properties.class).toBeUndefined();
+      expect(slide.content.join('')).toContain('class: b');
     });
   });
 
