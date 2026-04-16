@@ -57,7 +57,7 @@ export class SlideView {
     this.scalingElement.className = 'remark-slide-scaler';
 
     this.element = createSlideElement(this.slide);
-    this.contentElement = createContentElement(this.events, this.slideshow, this.slide);
+    this.contentElement = createContentElement(this.slideshow, this.slide);
     this.notesElement = createNotesElement(this.slideshow, this.slide.notes);
 
     this.contentElement.appendChild(this.slideNumber.element);
@@ -107,7 +107,7 @@ function createSlideElement(slide: Slide): HTMLElement {
   return element;
 }
 
-function createContentElement(_events: EventEmitter, slideshow: Slideshow, slide: Slide): HTMLElement {
+function createContentElement(slideshow: Slideshow, slide: Slide): HTMLElement {
   const element = document.createElement('div');
   if (slide.properties.name) element.id = 'slide-' + slide.properties.name;
   styleContentElement(slideshow, element, slide.properties);
