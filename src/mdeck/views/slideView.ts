@@ -211,10 +211,10 @@ function highlightBlockLines(block: HTMLElement, lines: number[]): void {
 function highlightBlockSpans(block: HTMLElement, highlightSpans: boolean | RegExp): void {
   let pattern: RegExp;
   if (highlightSpans === true) {
-    pattern = /([^`])`([^`]+?)`/g;
+    pattern = /(^|[^`])`([^`]+?)`/gm;
   } else if (highlightSpans instanceof RegExp) {
     if (!highlightSpans.global) throw new Error('highlightSpans RegExp must have /g flag');
-    pattern = new RegExp('([^])' + highlightSpans.source, highlightSpans.flags || 'g');
+    pattern = new RegExp('(^|[\\s\\S])' + highlightSpans.source, (highlightSpans.flags || 'g') + 'm');
   } else {
     throw new Error('Illegal value for highlightSpans');
   }
