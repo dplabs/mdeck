@@ -54,6 +54,14 @@ describe('Lexer', () => {
     it('recognizes ??? notes separator', () => {
       expect(lexer.lex('\n???\n')).toEqual([{ type: 'notes_separator', text: '???' }]);
     });
+
+    it('recognizes ??? with trailing spaces (issue #1)', () => {
+      expect(lexer.lex('\n???   \n')).toEqual([{ type: 'notes_separator', text: '???' }]);
+    });
+
+    it('recognizes ??? with trailing tabs (issue #1)', () => {
+      expect(lexer.lex('\n???\t\n')).toEqual([{ type: 'notes_separator', text: '???' }]);
+    });
   });
 
   describe('code blocks', () => {

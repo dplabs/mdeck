@@ -29,7 +29,7 @@ const regexByName: Record<string, RegExp> = {
   MACRO: /!\[:([^\] ]+)([^\]]*)\](?:\(([^\)]*)\))?/,
   SLIDE_SEPARATOR: /(?:^|\n)(---|<!--\s*break\s*-->)(?:\n|$)/,
   FRAGMENT_SEPARATOR: /(?:^|\n)(--)(?![^\n])/,
-  NOTES_SEPARATOR: /(?:^|\n)(\?{3})(?:\n|$)/,
+  NOTES_SEPARATOR: /(?:^|\n)(\?{3})[ \t]*(?:\n|$)/,
 };
 
 function replace(regex: RegExp, replacements: Record<string, RegExp>): RegExp {

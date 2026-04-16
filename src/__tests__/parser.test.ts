@@ -69,6 +69,18 @@ describe('Parser', () => {
     it('removes notes from slide content', () => {
       expect(parser.parse('content\n???\nnotes')[0].content).toEqual(['content']);
     });
+
+    it('parses notes after ??? with trailing spaces (issue #1)', () => {
+      const slide = parser.parse('content\n???   \nnotes')[0];
+      expect(slide.notes).toEqual(['notes']);
+      expect(slide.content).toEqual(['content']);
+    });
+
+    it('parses notes after ??? with trailing tab (issue #1)', () => {
+      const slide = parser.parse('content\n???\t\nnotes')[0];
+      expect(slide.notes).toEqual(['notes']);
+      expect(slide.content).toEqual(['content']);
+    });
   });
 
   describe('fenced code blocks', () => {
