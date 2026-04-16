@@ -9,6 +9,7 @@ import type { Dom } from '../dom.js';
 export interface SlideshowOptions {
   source?: string;
   sourceUrl?: string;
+  sourceUrls?: string[];
   container?: HTMLElement;
   ratio?: string;
   highlightStyle?: string;
@@ -71,7 +72,9 @@ export class Slideshow {
     applyEvents(this, _events);
     applyNavigation(this, _events, _options);
 
-    if (_options.sourceUrl) {
+    if (_options.sourceUrls?.length) {
+      this._loadFromUrls(_options.sourceUrls, callback);
+    } else if (_options.sourceUrl) {
       this._loadFromUrl(_options.sourceUrl, callback);
     } else {
       this._loadFromString(_options.source || '');
@@ -81,6 +84,7 @@ export class Slideshow {
 
   loadFromString(source: string): void { this._loadFromString(source); }
   loadFromUrl(url: string, callback?: (s: Slideshow) => void): void { this._loadFromUrl(url, callback); }
+  loadFromUrls(urls: string[], callback?: (s: Slideshow) => void): void { this._loadFromUrls(urls, callback); }
 
   update(): void { this._events.emit('resize'); }
   getLinks() { return this._links; }
@@ -138,6 +142,30 @@ export class Slideshow {
     };
     xhr.onerror = () => { throw new Error(xhr.statusText); };
     xhr.send(null);
+  }
+
+  private _loadFromUrls(urls: string[], callback?: (s: Slideshow) => void): void {
+    const fetchOne = (url: string): Promise<string> => new Promise((resolve, reject) => {
+      const xhr = new (this._dom.XMLHttpRequest)();
+      xhr.open('GET', url, true);
+      xhr.onload = () => {
+        if (xhr.readyState === 4) {
+          if (xhr.status === 200) {
+            resolve(xhr.responseText.replace(/\r\n/g, '\n'));
+          } else {
+            reject(new Error(xhr.statusText));
+          }
+        }
+      };
+      xhr.onerror = () => reject(new Error(xhr.statusText));
+      xhr.send(null);
+    });
+
+    Promise.all(urls.map(fetchOne)).then((parts) => {
+      this._options.source = parts.join('\n---\n');
+      this._loadFromString(this._options.source);
+      callback?.(this);
+    }).catch((err) => { throw err; });
   }
 }
 
