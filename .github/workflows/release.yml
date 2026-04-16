@@ -89,6 +89,7 @@ jobs:
           mkdir -p pages/dist
           cp dist/mdeck.umd.cjs pages/dist/
           cp dist/mdeck.js pages/dist/
+          cp index.html pages/index.html
           cp -r examples pages/
 
       - name: Configure GitHub Pages

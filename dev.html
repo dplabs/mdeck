@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>mdeck demo</title>
+  <meta charset="utf-8">
+</head>
+<body>
+<textarea id="source" style="display:none">
+class: center, middle
+
+# mdeck
+
+### Modern Markdown Slideshow
+
+Powered by [markdown-it](https://github.com/markdown-it/markdown-it)
+
+---
+
+# Slide 2
+
+Content here.
+
+.left[Left aligned]
+
+.right[Right aligned]
+
+---
+
+# Code highlighting
+
+```javascript
+function hello() {
+  return "world";
+}
+```
+
+???
+
+Notes for this slide.
+
+---
+
+# Last Slide
+
+Press **h** for help.
+
+</textarea>
+<script type="module" src="/src/index.ts"></script>
+<script type="module">
+  import { createSlideshow } from '/src/index.ts';
+  createSlideshow();
+</script>
+</body>
+</html>

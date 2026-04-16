@@ -3,6 +3,7 @@
 <head>
   <title>mdeck demo</title>
   <meta charset="utf-8">
+  <link rel="stylesheet" href="examples/styles/theme.css">
 </head>
 <body>
 <textarea id="source" style="display:none">
@@ -16,39 +17,107 @@ Powered by [markdown-it](https://github.com/markdown-it/markdown-it)
 
 ---
 
-# Slide 2
+# Features
+
+- Markdown formatting, with smart extensions
+
+- Presenter mode with notes and cloned view
+
+- Syntax highlighting via **highlight.js**
+
+- Slide scaling — consistent across all resolutions
+
+- Touch support — swipe to navigate
+
+---
+
+# Slide syntax
+
+Slides are separated by `---`:
+
+```markdown
+# Slide 1
 
 Content here.
 
-.left[Left aligned]
+---
 
-.right[Right aligned]
+# Slide 2
+
+More content.
+```
+
+---
+
+# Content classes
+
+Apply CSS classes to inline or block content:
+
+```markdown
+.center[This is centered]
+
+.pull-left[
+  Left column
+]
+
+.pull-right[
+  Right column
+]
+```
 
 ---
 
 # Code highlighting
 
 ```javascript
-function hello() {
-  return "world";
-}
+import { createSlideshow, markdownIt } from 'mdeck';
+
+// Add a markdown-it plugin
+markdownIt.use(myPlugin);
+
+// Mount the slideshow
+createSlideshow({ highlightStyle: 'monokai' });
 ```
 
 ???
 
-Notes for this slide.
+Notes are written after `???` and shown in presenter mode.
+
+Press **P** to toggle presenter mode.
 
 ---
 
-# Last Slide
+# Presenter mode
 
-Press **h** for help.
+Press **P** to open presenter mode:
 
+- Current slide notes
+- Preview of next slide
+- Presentation timer
+
+Press **C** to clone the slideshow in a new window.
+
+---
+
+# More examples
+
+| Example | What it shows |
+|---|---|
+| [Controls & keymaps](https://dplabs.github.io/mdeck/examples/controls.html) | Every keyboard shortcut, mouse and touch gesture |
+| [Advanced: custom markup](https://dplabs.github.io/mdeck/examples/advanced.html) | Content classes, CSS classes, markdown-it plugins, macros |
+| [External Markdown file](https://dplabs.github.io/mdeck/examples/external.html) | Loading slides from a `.md` file via `sourceUrl` |
+| [Inline source](https://dplabs.github.io/mdeck/examples/inline-source.html) | Passing Markdown directly as a `source` string |
+
+---
+class: center, middle
+
+# That's it!
+
+Press **h** for a full list of keyboard shortcuts.
 </textarea>
-<script type="module" src="/src/index.ts"></script>
-<script type="module">
-  import { createSlideshow } from '/src/index.ts';
-  createSlideshow();
+<script src="dist/mdeck.umd.cjs"></script>
+<script>
+  mdeck.createSlideshow();
 </script>
 </body>
 </html>
