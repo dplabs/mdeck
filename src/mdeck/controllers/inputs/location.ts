@@ -1,7 +1,6 @@
 import type EventEmitter from 'eventemitter3';
 import type { Dom } from '../../dom.js';
 import type { SlideshowView } from '../../views/slideshowView.js';
-import { hasClass } from '../../utils.js';
 
 export function register(events: EventEmitter, dom: Dom, slideshowView: SlideshowView): void {
   if (slideshowView.isEmbedded()) {
@@ -19,7 +18,7 @@ export function register(events: EventEmitter, dom: Dom, slideshowView: Slidesho
   }
 
   function updateHash(slideNoOrName: string | number) {
-    if (hasClass(slideshowView.containerElement, 'remark-presenter-mode')) {
+    if (slideshowView.containerElement.classList.contains('remark-presenter-mode')) {
       dom.setLocationHash('#p' + slideNoOrName);
     } else {
       dom.setLocationHash('#' + slideNoOrName);

@@ -4,7 +4,6 @@ import type { Slide } from '../models/slide.js';
 import type { Scaler } from '../scaler.js';
 import { convertMarkdown, convertMarkdownAsync } from '../converter.js';
 import { engine as highlighter } from '../highlighter.js';
-import { addClass } from '../utils.js';
 import { SlideNumber } from '../components/slide-number/slide-number.js';
 
 export class SlideView {
@@ -39,13 +38,13 @@ export class SlideView {
   }
 
   show(): void {
-    addClass(this.containerElement, 'remark-visible');
+    this.containerElement.classList.add('remark-visible');
     this.containerElement.classList.remove('remark-fading');
   }
 
   hide(): void {
     this.containerElement.classList.remove('remark-visible');
-    addClass(this.containerElement, 'remark-fading');
+    this.containerElement.classList.add('remark-fading');
     setTimeout(() => this.containerElement.classList.remove('remark-fading'), 1000);
   }
 
@@ -103,7 +102,7 @@ export class SlideView {
 function createSlideElement(slide: Slide): HTMLElement {
   const element = document.createElement('div');
   element.className = 'remark-slide';
-  if (slide.properties.continued === 'true') addClass(element, 'remark-slide-incremental');
+  if (slide.properties.continued === 'true') element.classList.add('remark-slide-incremental');
   return element;
 }
 
@@ -130,11 +129,11 @@ function createContentElement(slideshow: Slideshow, slide: Slide): HTMLElement {
 
 function styleContentElement(slideshow: Slideshow, element: HTMLElement, properties: Record<string, string>): void {
   element.className = '';
-  addClass(element, 'remark-slide-content');
-  (properties['class'] || '').split(/,| /).filter(Boolean).forEach((c) => addClass(element, c));
+  element.classList.add('remark-slide-content');
+  (properties['class'] || '').split(/,| /).filter(Boolean).forEach((c) => element.classList.add(c));
 
   const highlightStyle = properties['highlight-style'] || slideshow.getHighlightStyle();
-  if (highlightStyle) addClass(element, 'hljs-' + highlightStyle);
+  if (highlightStyle) element.classList.add('hljs-' + highlightStyle);
 
   if (properties['background-image']) element.style.backgroundImage = properties['background-image'];
   if (properties['background-color']) element.style.backgroundColor = properties['background-color'];
@@ -171,7 +170,7 @@ function highlightCodeBlocks(content: HTMLElement, slideshow: Slideshow): void {
     if (block.className === '') block.className = slideshow.getHighlightLanguage();
 
     if (block.parentElement?.tagName !== 'PRE') {
-      addClass(block, 'remark-inline-code');
+      block.classList.add('remark-inline-code');
       if (highlightInline) highlighter.highlightElement(block);
       return;
     }
@@ -186,7 +185,7 @@ function highlightCodeBlocks(content: HTMLElement, slideshow: Slideshow): void {
     if (highlightLines) highlightBlockLines(block, meta.highlightedLines);
     if (highlightSpans) highlightBlockSpans(block, highlightSpans);
 
-    addClass(block, 'remark-code');
+    block.classList.add('remark-code');
   });
 }
 
@@ -206,7 +205,7 @@ function wrapLines(block: HTMLElement): void {
 }
 
 function highlightBlockLines(block: HTMLElement, lines: number[]): void {
-  lines.forEach((i) => addClass(block.childNodes[i] as HTMLElement, 'remark-code-line-highlighted'));
+  lines.forEach((i) => (block.childNodes[i] as HTMLElement).classList.add('remark-code-line-highlighted'));
 }
 
 function highlightBlockSpans(block: HTMLElement, highlightSpans: boolean | RegExp): void {
