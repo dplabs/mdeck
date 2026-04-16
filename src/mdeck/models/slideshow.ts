@@ -49,6 +49,8 @@ export class Slideshow {
   on!: (...args: Parameters<EventEmitter['on']>) => this;
 
   private _slides: Slide[] = [];
+  private _slidesByName: Record<string, Slide> = {};
+  private _slidesByNumber: Record<number, Slide[]> = {};
   private _links: Record<string, { href: string; title?: string }> = {};
 
   constructor(private _events: EventEmitter, private _dom: Dom, private _options: SlideshowOptions, callback?: (slideshow: Slideshow) => void) {
@@ -70,8 +72,8 @@ export class Slideshow {
   getLinks() { return this._links; }
   getSlides(): Slide[] { return [...this._slides]; }
   getSlideCount(): number { return this._slides.length; }
-  getSlideByName(name: string): Slide | undefined { return (this._slides as unknown as { byName: Record<string, Slide> }).byName?.[name]; }
-  getSlidesByNumber(number: number): Slide[] | undefined { return (this._slides as unknown as { byNumber: Record<number, Slide[]> }).byNumber?.[number]; }
+  getSlideByName(name: string): Slide | undefined { return this._slidesByName[name]; }
+  getSlidesByNumber(number: number): Slide[] | undefined { return this._slidesByNumber[number]; }
 
   togglePresenterMode() { this._events.emit('togglePresenterMode'); }
   toggleHelp() { this._events.emit('toggleHelp'); }
@@ -94,7 +96,10 @@ export class Slideshow {
   getMarkdownRenderer(): ((markdown: string) => string | null | Promise<string | null>) | undefined { return this._options.markdownRenderer; }
 
   private _loadFromString(source: string): void {
-    this._slides = createSlides(source, this._options);
+    const { slides, byName, byNumber } = createSlides(source, this._options);
+    this._slides = slides;
+    this._slidesByName = byName;
+    this._slidesByNumber = byNumber;
     expandVariables(this._slides);
     this._links = {};
     this._slides.forEach((slide) => {
@@ -122,7 +127,7 @@ export class Slideshow {
   }
 }
 
-function createSlides(source: string, options: SlideshowOptions): Slide[] {
+function createSlides(source: string, options: SlideshowOptions): { slides: Slide[]; byName: Record<string, Slide>; byNumber: Record<number, Slide[]> } {
   const parser = new Parser();
   const parsed = parser.parse(source, macros, options);
   const slides: Slide[] = [];
@@ -130,9 +135,6 @@ function createSlides(source: string, options: SlideshowOptions): Slide[] {
   const byNumber: Record<number, Slide[]> = {};
   let layoutSlide: Slide | undefined;
   let slideNumber = 0;
-
-  (slides as unknown as { byName: Record<string, Slide>; byNumber: Record<number, Slide[]> }).byName = byName;
-  (slides as unknown as { byName: Record<string, Slide>; byNumber: Record<number, Slide[]> }).byNumber = byNumber;
 
   parsed.forEach((parsedSlide, i) => {
     let template: Slide | undefined;
@@ -179,13 +181,10 @@ function createSlides(source: string, options: SlideshowOptions): Slide[] {
           byNumber[slideNumber].push(slideViewModel);
         }
       }
-      if (parsedSlide.properties.name) {
-        (slides as unknown as { byName: Record<string, Slide> }).byName[parsedSlide.properties.name] = slideViewModel;
-      }
     }
   });
 
-  return slides;
+  return { slides, byName, byNumber };
 }
 
 function expandVariables(slides: Slide[]) {
