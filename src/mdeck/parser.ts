@@ -29,7 +29,6 @@ export type MacroMap = Record<string, MacroFn>;
 
 export class Parser {
   parse(src: string, macros: MacroMap = {}, options: ParserOptions = {}): ParsedSlide[] {
-    const self = this;
     const lexer = new Lexer();
     const tokens = lexer.lex(cleanInput(src));
     const slides: ParsedSlide[] = [];
@@ -54,7 +53,7 @@ export class Parser {
           }
           const value = macro.apply(token.obj, token.args);
           if (typeof value === 'string') {
-            const parsed = self.parse(value, macros);
+            const parsed = this.parse(value, macros);
             appendTo(stack[stack.length - 1], parsed[0].content[0]);
           } else {
             appendTo(stack[stack.length - 1], value === undefined ? '' : String(value));
