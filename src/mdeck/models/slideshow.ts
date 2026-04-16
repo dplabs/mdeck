@@ -29,7 +29,21 @@ export interface SlideshowOptions {
   includePresenterNotes?: boolean;
   inheritPresenterNotes?: boolean;
   timer?: Record<string, unknown>;
+  keyboardShortcuts?: KeyboardShortcutsConfig;
 }
+
+/**
+ * Maps action names to one or more key strings (using KeyboardEvent.key values),
+ * or null to disable the default binding for that action.
+ *
+ * Example:
+ *   keyboardShortcuts: {
+ *     gotoNextSlide: ['ArrowRight', 'ArrowDown', 'j', ' '],
+ *     gotoPreviousSlide: ['ArrowLeft', 'ArrowUp', 'k'],
+ *     toggleFullscreen: null, // disable
+ *   }
+ */
+export type KeyboardShortcutsConfig = Partial<Record<string, string | string[] | null>>;
 
 export type SlideOptions = Pick<SlideshowOptions, 'countIncrementalSlides' | 'excludedClasses' | 'disableIncrementalSlides' | 'includePresenterNotes' | 'inheritPresenterNotes'>;
 
