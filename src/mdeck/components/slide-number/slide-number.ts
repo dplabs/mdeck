@@ -6,7 +6,7 @@ export class SlideNumber {
 
   constructor(slide: Slide, slideshow: Slideshow) {
     this.element = document.createElement('div');
-    this.element.className = 'remark-slide-number';
+    this.element.className = 'remark-slide-number mdeck-slide-number';
     if (slideshow.getShowSlideNumber()) {
       this.element.innerHTML = formatSlideNumber(slide, slideshow);
     } else {

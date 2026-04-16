@@ -7,7 +7,7 @@ export const styler = {
     const head = document.getElementsByTagName('head')[0];
     const style = document.createElement('style');
     style.type = 'text/css';
-    style.title = 'remark';
+    style.title = 'mdeck';
     const css = documentStyles;
     style.innerHTML = css;
     head.insertBefore(style, head.firstChild);
@@ -44,7 +44,7 @@ export const styler = {
 };
 
 function getRemarkStylesheet(): CSSStyleSheet | undefined {
-  return Array.from(document.styleSheets).find((s) => s.title === 'remark');
+  return Array.from(document.styleSheets).find((s) => s.title === 'mdeck' || s.title === 'remark');
 }
 
 function getPageRule(stylesheet: CSSStyleSheet): CSSRule | undefined {

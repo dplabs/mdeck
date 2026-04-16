@@ -4,35 +4,35 @@ import pkg from '../../package.json';
 export const version = pkg.version;
 export { documentStyles };
 
-export const containerLayout = `<div class="remark-notes-area">
-  <div class="remark-top-area">
-    <div class="remark-toolbar">
-      <a class="remark-toolbar-link" href="#increase">+</a>
-      <a class="remark-toolbar-link" href="#decrease">-</a>
-      <span class="remark-toolbar-timer"></span>
+export const containerLayout = `<div class="remark-notes-area mdeck-notes-area">
+  <div class="remark-top-area mdeck-top-area">
+    <div class="remark-toolbar mdeck-toolbar">
+      <a class="remark-toolbar-link mdeck-toolbar-link" href="#increase">+</a>
+      <a class="remark-toolbar-link mdeck-toolbar-link" href="#decrease">-</a>
+      <span class="remark-toolbar-timer mdeck-toolbar-timer"></span>
     </div>
   </div>
-  <div class="remark-bottom-area">
-    <div class="remark-notes-current-area">
-      <div class="remark-toggle">Notes for current slide</div>
-      <div class="remark-notes"></div>
+  <div class="remark-bottom-area mdeck-bottom-area">
+    <div class="remark-notes-current-area mdeck-notes-current-area">
+      <div class="remark-toggle mdeck-toggle">Notes for current slide</div>
+      <div class="remark-notes mdeck-notes"></div>
     </div>
-    <div class="remark-notes-preview-area">
-      <div class="remark-toggle">Notes for next slide</div>
-      <div class="remark-notes-preview"></div>
+    <div class="remark-notes-preview-area mdeck-notes-preview-area">
+      <div class="remark-toggle mdeck-toggle">Notes for next slide</div>
+      <div class="remark-notes-preview mdeck-notes-preview"></div>
     </div>
   </div>
 </div>
-<div class="remark-slides-area"></div>
-<div class="remark-preview-area"></div>
-<div class="remark-backdrop"></div>
-<div class="remark-pause">
-  <div class="remark-pause-lozenge">
+<div class="remark-slides-area mdeck-slides-area"></div>
+<div class="remark-preview-area mdeck-preview-area"></div>
+<div class="remark-backdrop mdeck-backdrop"></div>
+<div class="remark-pause mdeck-pause">
+  <div class="remark-pause-lozenge mdeck-pause-lozenge">
     <span>Paused</span>
   </div>
 </div>
-<div class="remark-help">
-  <div class="remark-help-content">
+<div class="remark-help mdeck-help">
+  <div class="remark-help-content mdeck-help-content">
     <h1>Help</h1>
     <p><b>Keyboard shortcuts</b></p>
     <table class="light-keys">

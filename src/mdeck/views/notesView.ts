@@ -36,13 +36,13 @@ export class NotesView {
   }
 
   configureElements(): void {
-    this.notesElement = this.element.getElementsByClassName('remark-notes')[0] as HTMLElement;
-    this.notesPreviewElement = this.element.getElementsByClassName('remark-notes-preview')[0] as HTMLElement;
+    this.notesElement = this.element.getElementsByClassName('mdeck-notes')[0] as HTMLElement;
+    this.notesPreviewElement = this.element.getElementsByClassName('mdeck-notes-preview')[0] as HTMLElement;
 
     this.notesElement.addEventListener('wheel', (e) => e.stopPropagation());
     this.notesPreviewElement.addEventListener('wheel', (e) => e.stopPropagation());
 
-    const toolbar = this.element.getElementsByClassName('remark-toolbar')[0] as HTMLElement;
+    const toolbar = this.element.getElementsByClassName('mdeck-toolbar')[0] as HTMLElement;
     const links = toolbar.getElementsByTagName('a');
 
     const commands: Record<string, () => void> = {

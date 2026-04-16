@@ -37,7 +37,9 @@ export class SlideshowView {
     events.on('slidesChanged', () => this.updateSlideViews());
 
     events.on('hideSlide', (slideIndex: number) => {
-      Array.from(this.elementArea.getElementsByClassName('remark-fading')).forEach((s) => (s as HTMLElement).classList.remove('remark-fading'));
+      Array.from(this.elementArea.getElementsByClassName('remark-fading')).forEach((s) => {
+        (s as HTMLElement).classList.remove('remark-fading', 'mdeck-fading');
+      });
       this.hideSlide(slideIndex);
     });
 
@@ -45,7 +47,7 @@ export class SlideshowView {
 
     events.on('forcePresenterMode', () => {
       if (!this.containerElement.classList.contains('remark-presenter-mode')) {
-        this.containerElement.classList.toggle('remark-presenter-mode');
+        this.containerElement.classList.add('remark-presenter-mode', 'mdeck-presenter-mode');
         this.scaleElements();
         printing.setPageOrientation('landscape');
       }
@@ -53,22 +55,38 @@ export class SlideshowView {
 
     events.on('togglePresenterMode', () => {
       this.containerElement.classList.toggle('remark-presenter-mode');
+      this.containerElement.classList.toggle('mdeck-presenter-mode');
       this.scaleElements();
       events.emit('toggledPresenter', this.slideshow.getCurrentSlideIndex() + 1);
       printing.setPageOrientation(this.containerElement.classList.contains('remark-presenter-mode') ? 'portrait' : 'landscape');
     });
 
-    events.on('toggleHelp', () => this.containerElement.classList.toggle('remark-help-mode'));
-    events.on('toggleBlackout', () => this.containerElement.classList.toggle('remark-blackout-mode'));
-    events.on('toggleMirrored', () => this.containerElement.classList.toggle('remark-mirrored-mode'));
-
-    events.on('hideOverlay', () => {
-      this.containerElement.classList.remove('remark-blackout-mode');
-      this.containerElement.classList.remove('remark-help-mode');
+    events.on('toggleHelp', () => {
+      this.containerElement.classList.toggle('remark-help-mode');
+      this.containerElement.classList.toggle('mdeck-help-mode');
+    });
+    events.on('toggleBlackout', () => {
+      this.containerElement.classList.toggle('remark-blackout-mode');
+      this.containerElement.classList.toggle('mdeck-blackout-mode');
+    });
+    events.on('toggleMirrored', () => {
+      this.containerElement.classList.toggle('remark-mirrored-mode');
+      this.containerElement.classList.toggle('mdeck-mirrored-mode');
     });
 
-    events.on('pause', () => this.containerElement.classList.toggle('remark-pause-mode'));
-    events.on('resume', () => this.containerElement.classList.toggle('remark-pause-mode'));
+    events.on('hideOverlay', () => {
+      this.containerElement.classList.remove('remark-blackout-mode', 'mdeck-blackout-mode');
+      this.containerElement.classList.remove('remark-help-mode', 'mdeck-help-mode');
+    });
+
+    events.on('pause', () => {
+      this.containerElement.classList.toggle('remark-pause-mode');
+      this.containerElement.classList.toggle('mdeck-pause-mode');
+    });
+    events.on('resume', () => {
+      this.containerElement.classList.toggle('remark-pause-mode');
+      this.containerElement.classList.toggle('mdeck-pause-mode');
+    });
 
     this.handleFullscreen();
   }
@@ -79,10 +97,10 @@ export class SlideshowView {
 
   configureContainerElement(element: HTMLElement): void {
     this.containerElement = element;
-    element.classList.add('remark-container');
+    element.classList.add('remark-container', 'mdeck-container');
 
     if (element === this.dom.getBodyElement()) {
-      this.dom.getHTMLElement().classList.add('remark-container');
+      this.dom.getHTMLElement().classList.add('remark-container', 'mdeck-container');
       forwardEvents(this.events, window, ['hashchange', 'resize', 'keydown', 'keypress', 'mousewheel', 'message', 'DOMMouseScroll']);
       forwardEvents(this.events, element, ['touchstart', 'touchmove', 'touchend', 'click', 'contextmenu']);
     } else {
@@ -100,16 +118,16 @@ export class SlideshowView {
 
   configureChildElements(): void {
     this.containerElement.innerHTML += containerLayout;
-    this.elementArea = this.containerElement.getElementsByClassName('remark-slides-area')[0] as HTMLElement;
-    this.previewArea = this.containerElement.getElementsByClassName('remark-preview-area')[0] as HTMLElement;
-    this.notesArea = this.containerElement.getElementsByClassName('remark-notes-area')[0] as HTMLElement;
+    this.elementArea = this.containerElement.getElementsByClassName('mdeck-slides-area')[0] as HTMLElement;
+    this.previewArea = this.containerElement.getElementsByClassName('mdeck-preview-area')[0] as HTMLElement;
+    this.notesArea = this.containerElement.getElementsByClassName('mdeck-notes-area')[0] as HTMLElement;
 
     void new NotesView(this.events, this.notesArea, () => this.slideViews);
 
-    this.backdropElement = this.containerElement.getElementsByClassName('remark-backdrop')[0] as HTMLElement;
-    this.helpElement = this.containerElement.getElementsByClassName('remark-help')[0] as HTMLElement;
-    this.timerElement = this.notesArea.getElementsByClassName('remark-toolbar-timer')[0] as HTMLElement;
-    this.pauseElement = this.containerElement.getElementsByClassName('remark-pause')[0] as HTMLElement;
+    this.backdropElement = this.containerElement.getElementsByClassName('mdeck-backdrop')[0] as HTMLElement;
+    this.helpElement = this.containerElement.getElementsByClassName('mdeck-help')[0] as HTMLElement;
+    this.timerElement = this.notesArea.getElementsByClassName('mdeck-toolbar-timer')[0] as HTMLElement;
+    this.pauseElement = this.containerElement.getElementsByClassName('mdeck-pause')[0] as HTMLElement;
 
     this.events.on('propertiesChanged', (changes: Record<string, unknown>) => {
       if ('ratio' in changes) this.updateDimensions();

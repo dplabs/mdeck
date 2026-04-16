@@ -18,7 +18,7 @@ export function register(events: EventEmitter, dom: Dom, slideshowView: Slidesho
   }
 
   function updateHash(slideNoOrName: string | number) {
-    if (slideshowView.containerElement.classList.contains('remark-presenter-mode')) {
+    if (slideshowView.containerElement.classList.contains('mdeck-presenter-mode')) {
       dom.setLocationHash('#p' + slideNoOrName);
     } else {
       dom.setLocationHash('#' + slideNoOrName);
