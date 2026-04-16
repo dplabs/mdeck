@@ -1,64 +1,124 @@
 import type EventEmitter from 'eventemitter3';
+import type { KeyboardShortcutsConfig } from '../../models/slideshow.js';
+
+/**
+ * Default keyboard shortcuts. Keys use KeyboardEvent.key values.
+ * Multiple keys can be bound to one action.
+ */
+export const DEFAULT_SHORTCUTS: Record<string, string[]> = {
+  gotoNextSlide:       ['ArrowRight', 'ArrowDown', 'PageDown', 'j', ' '],
+  gotoPreviousSlide:   ['ArrowLeft', 'ArrowUp', 'PageUp', 'k'],
+  gotoFirstSlide:      ['Home'],
+  gotoLastSlide:       ['End'],
+  toggleBlackout:      ['b'],
+  toggleMirrored:      ['m'],
+  createClone:         ['c'],
+  togglePresenterMode: ['p'],
+  toggleFullscreen:    ['f'],
+  toggleTimer:         ['s'],
+  resetTimer:          ['t'],
+  toggleHelp:          ['h', '?'],
+  hideOverlay:         ['Escape'],
+};
+
+/** Resolve the effective shortcut map by merging defaults with user overrides. */
+function resolveShortcuts(userConfig?: KeyboardShortcutsConfig): Record<string, string[]> {
+  const result: Record<string, string[]> = {};
+
+  for (const [action, keys] of Object.entries(DEFAULT_SHORTCUTS)) {
+    const override = userConfig?.[action];
+    if (override === null) continue;                    // disabled
+    if (override === undefined) {
+      result[action] = keys;                           // keep default
+    } else {
+      result[action] = Array.isArray(override) ? override : [override]; // user override
+    }
+  }
+
+  // Allow user to define entirely new action → key bindings
+  if (userConfig) {
+    for (const [action, keys] of Object.entries(userConfig)) {
+      if (action in DEFAULT_SHORTCUTS) continue;       // already handled above
+      if (keys === null || keys === undefined) continue;
+      result[action] = Array.isArray(keys) ? keys : [keys];
+    }
+  }
+
+  return result;
+}
+
+/** Build an inverted map: normalised key string → action name. */
+function buildKeyMap(shortcuts: Record<string, string[]>): Map<string, string> {
+  const map = new Map<string, string>();
+  for (const [action, keys] of Object.entries(shortcuts)) {
+    for (const k of keys) {
+      map.set(normaliseKey(k), action);
+    }
+  }
+  return map;
+}
+
+/** Normalise a key string to lowercase for case-insensitive single-char keys. */
+function normaliseKey(key: string): string {
+  return key.length === 1 ? key.toLowerCase() : key;
+}
 
 export class Keyboard {
   private _events: EventEmitter;
+  private _keyMap: Map<string, string>;
   private _gotoSlideNumber = '';
+  private _handler: ((event: KeyboardEvent) => void) | null = null;
 
-  constructor(events: EventEmitter) {
+  constructor(events: EventEmitter, shortcuts?: KeyboardShortcutsConfig) {
     this._events = events;
+    this._keyMap = buildKeyMap(resolveShortcuts(shortcuts));
     this.activate();
   }
 
   activate() {
     this._gotoSlideNumber = '';
-    this.addKeyboardEventListeners();
+    this._handler = (event: KeyboardEvent) => this._onKeydown(event);
+    this._events.on('keydown', this._handler);
   }
 
   deactivate() {
-    this.removeKeyboardEventListeners();
+    if (this._handler) {
+      this._events.removeListener('keydown', this._handler);
+      this._handler = null;
+    }
   }
 
-  addKeyboardEventListeners() {
-    const events = this._events;
-    events.on('keydown', (event: KeyboardEvent) => {
-      if (event.metaKey || event.ctrlKey || event.altKey) return;
-      switch (event.keyCode) {
-        case 33: case 37: case 38: events.emit('gotoPreviousSlide'); break;
-        case 32: event.shiftKey ? events.emit('gotoPreviousSlide') : events.emit('gotoNextSlide'); break;
-        case 34: case 39: case 40: events.emit('gotoNextSlide'); break;
-        case 36: events.emit('gotoFirstSlide'); break;
-        case 35: events.emit('gotoLastSlide'); break;
-        case 27: events.emit('hideOverlay'); break;
-        case 13:
-          if (this._gotoSlideNumber) { events.emit('gotoSlideNumber', this._gotoSlideNumber); this._gotoSlideNumber = ''; }
-          break;
-      }
-    });
-    events.on('keypress', (event: KeyboardEvent) => {
-      if (event.metaKey || event.ctrlKey) return;
-      const key = String.fromCharCode(event.which).toLowerCase();
-      let prevent = true;
-      switch (key) {
-        case 'j': events.emit('gotoNextSlide'); break;
-        case 'k': events.emit('gotoPreviousSlide'); break;
-        case 'b': events.emit('toggleBlackout'); break;
-        case 'm': events.emit('toggleMirrored'); break;
-        case 'c': events.emit('createClone'); break;
-        case 'p': events.emit('togglePresenterMode'); break;
-        case 'f': events.emit('toggleFullscreen'); break;
-        case 's': events.emit('toggleTimer'); break;
-        case 't': events.emit('resetTimer'); break;
-        case '1': case '2': case '3': case '4': case '5': case '6': case '7': case '8': case '9': case '0':
-          this._gotoSlideNumber += key; break;
-        case 'h': case '?': events.emit('toggleHelp'); break;
-        default: prevent = false;
-      }
-      if (prevent) event.preventDefault?.();
-    });
-  }
+  private _onKeydown(event: KeyboardEvent) {
+    if (event.metaKey || event.ctrlKey || event.altKey) return;
 
-  removeKeyboardEventListeners() {
-    this._events.removeAllListeners('keydown');
-    this._events.removeAllListeners('keypress');
+    const key = event.key;
+
+    // Digit accumulator: 0-9 builds a slide number, Enter commits it.
+    if (/^[0-9]$/.test(key)) {
+      this._gotoSlideNumber += key;
+      event.preventDefault?.();
+      return;
+    }
+    if (key === 'Enter') {
+      if (this._gotoSlideNumber) {
+        this._events.emit('gotoSlideNumber', this._gotoSlideNumber);
+        this._gotoSlideNumber = '';
+      }
+      return;
+    }
+
+    // Shift+Space → previous slide (special case, not in keymap).
+    if (key === ' ' && event.shiftKey) {
+      this._events.emit('gotoPreviousSlide');
+      event.preventDefault?.();
+      return;
+    }
+
+    const normKey = normaliseKey(key);
+    const action = this._keyMap.get(normKey);
+    if (action) {
+      this._events.emit(action);
+      event.preventDefault?.();
+    }
   }
 }
