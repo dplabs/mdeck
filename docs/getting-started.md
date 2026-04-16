@@ -10,7 +10,7 @@ npm install mdeck
 
 ### Via `<script>` tag (UMD)
 
-Download `mdeck.umd.cjs` from the [releases page](https://github.com/your-org/mdeck/releases) or build it yourself (see [Building from source](#building-from-source)).
+Download `mdeck.umd.cjs` from the [releases page](https://github.com/dplabs/mdeck/releases) or build it yourself (see [Building from source](#building-from-source)).
 
 ---
 
@@ -100,29 +100,35 @@ The file is fetched with `fetch()` so it must be served from the same origin or 
 
 ## Running the examples locally
 
-The `examples/` directory contains ready-to-run HTML files. Because they load assets via relative paths, they need a static server — opening them as `file://` URLs won't work.
+The `examples/` directory contains ready-to-run HTML files. They need a static server — opening them as `file://` URLs won't work.
 
 ```bash
+# Clone and install
+git clone https://github.com/dplabs/mdeck
+cd mdeck
+npm install
+
+# Start the dev server
 npm run dev
 ```
 
-Open the URL shown in the terminal (usually `http://localhost:5173`) and navigate to the example you want, e.g. `http://localhost:5173/examples/index.html`.
+Then open any of these in your browser:
 
-| File | Description |
+| URL | Description |
 |---|---|
-| `index.html` | Quick demo with a default deck |
-| `introduction.html` | Full feature tour (ported from remarkjs.com) |
-| `advanced.html` | Custom CSS classes, markdown-it plugins, macros |
-| `controls.html` | All keyboard, mouse, and touch controls |
-| `external.html` | Load slides from an external `.md` file via `sourceUrl` |
-| `inline-source.html` | Pass Markdown directly via the `source` option |
+| http://localhost:5173/examples/index.html | Quick demo with a default deck |
+| http://localhost:5173/examples/advanced.html | Custom CSS classes, markdown-it plugins, macros |
+| http://localhost:5173/examples/controls.html | All keyboard, mouse, and touch controls |
+| http://localhost:5173/examples/external.html | Load slides from an external `.md` file via `sourceUrl` |
+| http://localhost:5173/examples/inline-source.html | Pass Markdown directly via the `source` option |
+| http://localhost:5173/examples/remarkjs-compat.html | remark.js compatibility demo |
 
 ---
 
 ## Building from source
 
 ```bash
-git clone https://github.com/your-org/mdeck
+git clone https://github.com/dplabs/mdeck
 cd mdeck
 npm install
 npm run dev      # start dev server at localhost:5173

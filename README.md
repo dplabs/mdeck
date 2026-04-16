@@ -52,30 +52,20 @@ Another slide.
 
 ---
 
-## Running the examples locally
+## Examples
 
-The `examples/` directory contains ready-to-run HTML files. They need a static server — opening them as `file://` URLs won't work.
+Live demos are published to GitHub Pages on every release:
 
-```bash
-# Clone and install
-git clone https://github.com/your-org/mdeck
-cd mdeck
-npm install
-
-# Start the dev server
-npm run dev
-```
-
-Then open any of these in your browser:
-
-| URL | Description |
+| Example | Description |
 |---|---|
-| http://localhost:5173/examples/index.html | Quick demo with a default deck |
-| http://localhost:5173/examples/advanced.html | Custom CSS classes, markdown-it plugins, macros |
-| http://localhost:5173/examples/controls.html | All keyboard, mouse, and touch controls |
-| http://localhost:5173/examples/external.html | Load slides from an external `.md` file via `sourceUrl` |
-| http://localhost:5173/examples/inline-source.html | Pass Markdown directly via the `source` option |
-| http://localhost:5173/examples/remarkjs-compat.html | remark.js compatibility demo |
+| [Default deck](https://dplabs.github.io/mdeck/examples/index.html) | Quick demo with a default deck |
+| [Advanced](https://dplabs.github.io/mdeck/examples/advanced.html) | Custom CSS classes, markdown-it plugins, macros |
+| [Controls](https://dplabs.github.io/mdeck/examples/controls.html) | All keyboard, mouse, and touch controls |
+| [External source](https://dplabs.github.io/mdeck/examples/external.html) | Load slides from an external `.md` file via `sourceUrl` |
+| [Inline source](https://dplabs.github.io/mdeck/examples/inline-source.html) | Pass Markdown directly via the `source` option |
+| [remark.js compat](https://dplabs.github.io/mdeck/examples/remarkjs-compat.html) | remark.js compatibility demo |
+
+To run the examples locally, see [Getting started](docs/getting-started.md#running-the-examples-locally).
 
 ---
 
