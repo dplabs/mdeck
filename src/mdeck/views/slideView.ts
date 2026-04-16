@@ -211,18 +211,24 @@ function highlightBlockLines(block: HTMLElement, lines: number[]): void {
 function highlightBlockSpans(block: HTMLElement, highlightSpans: boolean | RegExp): void {
   let pattern: RegExp;
   if (highlightSpans === true) {
-    pattern = /(^|[^`])`([^`]+?)`/gm;
+    // Use a lookbehind so the opening backtick is not consumed along with its
+    // preceding character. This fixes two bugs:
+    // - #2: spans at the start of a line were never matched (no preceding char)
+    // - #3: adjacent spans like `foo`(`bar`) incorrectly captured ( as content
+    //   because the old ([^`]) group consumed the last char of the first span,
+    //   treating its closing backtick as the opening of a new span.
+    // The lookbehind also handles escape: \` is not treated as an opening backtick.
+    pattern = /(?<![\`\\])`([^`]+?)`/g;
   } else if (highlightSpans instanceof RegExp) {
     if (!highlightSpans.global) throw new Error('highlightSpans RegExp must have /g flag');
-    pattern = new RegExp('(^|[\\s\\S])' + highlightSpans.source, (highlightSpans.flags || 'g') + 'm');
+    pattern = new RegExp('(?<![\\`\\\\])' + highlightSpans.source, highlightSpans.flags || 'g');
   } else {
     throw new Error('Illegal value for highlightSpans');
   }
   Array.from(block.childNodes).forEach((node) => {
     if (node instanceof HTMLElement) {
-      node.innerHTML = node.innerHTML.replace(pattern, (m, e, c) => {
-        if (e === '\\') return m.slice(1);
-        return e + `<span class="remark-code-span-highlighted mdeck-code-span-highlighted">${c}</span>`;
+      node.innerHTML = node.innerHTML.replace(pattern, (_m, c) => {
+        return `<span class="remark-code-span-highlighted mdeck-code-span-highlighted">${c}</span>`;
       });
     }
   });
