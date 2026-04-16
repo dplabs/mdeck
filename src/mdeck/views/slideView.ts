@@ -222,7 +222,7 @@ function highlightBlockSpans(block: HTMLElement, highlightSpans: boolean | RegEx
   Array.from(block.childNodes).forEach((node) => {
     if (node instanceof HTMLElement) {
       node.innerHTML = node.innerHTML.replace(pattern, (m, e, c) => {
-        if (e === '\\') return m.substr(1);
+        if (e === '\\') return m.slice(1);
         return e + `<span class="remark-code-span-highlighted">${c}</span>`;
       });
     }

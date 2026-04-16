@@ -57,7 +57,7 @@ export class NotesView {
     Array.from(links).forEach((link) => {
       link.addEventListener('click', (e) => {
         e.preventDefault();
-        const command = (e.target as HTMLAnchorElement).hash.substr(1);
+        const command = (e.target as HTMLAnchorElement).hash.slice(1);
         commands[command]?.();
       });
     });

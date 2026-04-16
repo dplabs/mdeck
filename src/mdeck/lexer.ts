@@ -118,7 +118,7 @@ function getTextInBrackets(src: string, offset: number): string | undefined {
     depth += (chr === '[' ? 1 : chr === ']' ? -1 : 0);
   }
   if (depth === 0) {
-    return src.substr(offset, pos - offset - 1);
+    return src.slice(offset, pos - 1);
   }
   return undefined;
 }

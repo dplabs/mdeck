@@ -14,7 +14,7 @@ export function register(events: EventEmitter, dom: Dom, slideshowView: Slidesho
   }
 
   function navigateByHash() {
-    const slideNoOrName = (dom.getLocationHash() || '').substr(1);
+    const slideNoOrName = (dom.getLocationHash() || '').slice(1);
     events.emit('gotoSlide', slideNoOrName);
   }
 
