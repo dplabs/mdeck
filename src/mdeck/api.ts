@@ -30,9 +30,9 @@ export function createSlideshow(options: SlideshowOptions = {}, callback?: (slid
 
   const slideshow = new Slideshow(events, _dom, options, (ss) => {
     const slideshowView = new SlideshowView(events, _dom, options, ss);
-    const controller = (options.controller as DefaultController)
-      || new DefaultController(events, _dom, slideshowView, (options.navigation ?? {}) as Record<string, unknown>);
-    void controller;
+    if (!options.controller) {
+      new DefaultController(events, _dom, slideshowView, (options.navigation ?? {}) as Record<string, unknown>);
+    }
     callback?.(ss);
   });
 
