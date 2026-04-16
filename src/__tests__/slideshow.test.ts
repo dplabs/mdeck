@@ -122,6 +122,49 @@ describe('Slideshow', () => {
       slideshow.loadFromString('a\n---\ncount: false\n\nb\n---\nc');
       expect(slideshow.getSlidesByNumber(1)).toHaveLength(2);
     });
+
+    describe('jump-to-slide with countIncrementalSlides: false (issue #10)', () => {
+      // Source: Slide 1, Slide 2, Slide 2b (incremental --), Slide 3
+      // With countIncrementalSlides:false the displayed numbers are 1, 2, 2, 3.
+      // Typing "3" + Enter must navigate to "Slide 3", not an unexpected slide.
+      const source = '# Slide 1\n---\n# Slide 2\n--\n## Slide 2b\n---\n# Slide 3';
+
+      beforeEach(() => {
+        slideshow = new Slideshow(events, dom, { countIncrementalSlides: false });
+        slideshow.loadFromString(source);
+      });
+
+      it('slide numbers are 1, 2, 2, 3', () => {
+        const numbers = slideshow.getSlides().map((s) => s.getSlideNumber());
+        expect(numbers).toEqual([1, 2, 2, 3]);
+      });
+
+      it('byNumber[1] contains only Slide 1', () => {
+        expect(slideshow.getSlidesByNumber(1)).toHaveLength(1);
+        expect(slideshow.getSlidesByNumber(1)![0].getSlideNumber()).toBe(1);
+      });
+
+      it('byNumber[2] groups Slide 2 and its incremental Slide 2b', () => {
+        expect(slideshow.getSlidesByNumber(2)).toHaveLength(2);
+      });
+
+      it('byNumber[3] contains only Slide 3', () => {
+        expect(slideshow.getSlidesByNumber(3)).toHaveLength(1);
+      });
+
+      it('jumping to displayed number 3 lands on Slide 3 (last slide)', () => {
+        // gotoSlideNumber resolves via byNumber; the first entry in byNumber[3]
+        // must be the actual "Slide 3", i.e. the last slide in the deck.
+        const slides = slideshow.getSlidesByNumber(3)!;
+        expect(slides).toHaveLength(1);
+        const lastSlideIndex = slideshow.getSlideCount() - 1;
+        expect(slides[0].getSlideIndex()).toBe(lastSlideIndex);
+      });
+
+      it('byNumber[4] is undefined (no slide with displayed number 4)', () => {
+        expect(slideshow.getSlidesByNumber(4)).toBeUndefined();
+      });
+    });
   });
 
   describe('layout slides', () => {
