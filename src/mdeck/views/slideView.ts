@@ -38,22 +38,22 @@ export class SlideView {
   }
 
   show(): void {
-    this.containerElement.classList.add('remark-visible');
-    this.containerElement.classList.remove('remark-fading');
+    this.containerElement.classList.add('remark-visible', 'mdeck-visible');
+    this.containerElement.classList.remove('remark-fading', 'mdeck-fading');
   }
 
   hide(): void {
-    this.containerElement.classList.remove('remark-visible');
-    this.containerElement.classList.add('remark-fading');
-    setTimeout(() => this.containerElement.classList.remove('remark-fading'), 1000);
+    this.containerElement.classList.remove('remark-visible', 'mdeck-visible');
+    this.containerElement.classList.add('remark-fading', 'mdeck-fading');
+    setTimeout(() => this.containerElement.classList.remove('remark-fading', 'mdeck-fading'), 1000);
   }
 
   configureElements(): void {
     this.containerElement = document.createElement('div');
-    this.containerElement.className = 'remark-slide-container';
+    this.containerElement.className = 'remark-slide-container mdeck-slide-container';
 
     this.scalingElement = document.createElement('div');
-    this.scalingElement.className = 'remark-slide-scaler';
+    this.scalingElement.className = 'remark-slide-scaler mdeck-slide-scaler';
 
     this.element = createSlideElement(this.slide);
     this.contentElement = createContentElement(this.slideshow, this.slide);
@@ -101,8 +101,8 @@ export class SlideView {
 
 function createSlideElement(slide: Slide): HTMLElement {
   const element = document.createElement('div');
-  element.className = 'remark-slide';
-  if (slide.properties.continued === 'true') element.classList.add('remark-slide-incremental');
+  element.className = 'remark-slide mdeck-slide';
+  if (slide.properties.continued === 'true') element.classList.add('remark-slide-incremental', 'mdeck-slide-incremental');
   return element;
 }
 
@@ -129,7 +129,7 @@ function createContentElement(slideshow: Slideshow, slide: Slide): HTMLElement {
 
 function styleContentElement(slideshow: Slideshow, element: HTMLElement, properties: Record<string, string>): void {
   element.className = '';
-  element.classList.add('remark-slide-content');
+  element.classList.add('remark-slide-content', 'mdeck-slide-content');
   (properties['class'] || '').split(/,| /).filter(Boolean).forEach((c) => element.classList.add(c));
 
   const highlightStyle = properties['highlight-style'] || slideshow.getHighlightStyle();
@@ -143,7 +143,7 @@ function styleContentElement(slideshow: Slideshow, element: HTMLElement, propert
 
 function createNotesElement(slideshow: Slideshow, notes: unknown[]): HTMLElement {
   const element = document.createElement('div');
-  element.className = 'remark-slide-notes';
+  element.className = 'remark-slide-notes mdeck-slide-notes';
 
   const renderer = slideshow.getMarkdownRenderer();
   if (renderer) {
@@ -170,7 +170,7 @@ function highlightCodeBlocks(content: HTMLElement, slideshow: Slideshow): void {
     if (block.className === '') block.className = slideshow.getHighlightLanguage();
 
     if (block.parentElement?.tagName !== 'PRE') {
-      block.classList.add('remark-inline-code');
+      block.classList.add('remark-inline-code', 'mdeck-inline-code');
       if (highlightInline) highlighter.highlightElement(block);
       return;
     }
@@ -185,7 +185,7 @@ function highlightCodeBlocks(content: HTMLElement, slideshow: Slideshow): void {
     if (highlightLines) highlightBlockLines(block, meta.highlightedLines);
     if (highlightSpans) highlightBlockSpans(block, highlightSpans);
 
-    block.classList.add('remark-code');
+    block.classList.add('remark-code', 'mdeck-code');
   });
 }
 
@@ -199,13 +199,13 @@ function extractMetadata(block: HTMLElement): { highlightedLines: number[] } {
 }
 
 function wrapLines(block: HTMLElement): void {
-  const lines = block.innerHTML.split(/\r?\n/).map((line) => `<div class="remark-code-line">${line}</div>`);
+  const lines = block.innerHTML.split(/\r?\n/).map((line) => `<div class="remark-code-line mdeck-code-line">${line}</div>`);
   if (lines.length && lines[lines.length - 1].includes('><')) lines.pop();
   block.innerHTML = lines.join('');
 }
 
 function highlightBlockLines(block: HTMLElement, lines: number[]): void {
-  lines.forEach((i) => (block.childNodes[i] as HTMLElement).classList.add('remark-code-line-highlighted'));
+  lines.forEach((i) => (block.childNodes[i] as HTMLElement).classList.add('remark-code-line-highlighted', 'mdeck-code-line-highlighted'));
 }
 
 function highlightBlockSpans(block: HTMLElement, highlightSpans: boolean | RegExp): void {
@@ -222,7 +222,7 @@ function highlightBlockSpans(block: HTMLElement, highlightSpans: boolean | RegEx
     if (node instanceof HTMLElement) {
       node.innerHTML = node.innerHTML.replace(pattern, (m, e, c) => {
         if (e === '\\') return m.slice(1);
-        return e + `<span class="remark-code-span-highlighted">${c}</span>`;
+        return e + `<span class="remark-code-span-highlighted mdeck-code-span-highlighted">${c}</span>`;
       });
     }
   });
