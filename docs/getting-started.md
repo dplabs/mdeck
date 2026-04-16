@@ -103,14 +103,10 @@ The file is fetched with `fetch()` so it must be served from the same origin or 
 The `examples/` directory contains ready-to-run HTML files. Because they load assets via relative paths, they need a static server — opening them as `file://` URLs won't work.
 
 ```bash
-# Build the library first
-npm run build
-
-# Then start a preview server (serves dist/ and examples/)
-npm run preview
+npm run dev
 ```
 
-Open the URL shown in the terminal (usually `http://localhost:4173`) and navigate to the example you want.
+Open the URL shown in the terminal (usually `http://localhost:5173`) and navigate to the example you want, e.g. `http://localhost:5173/examples/index.html`.
 
 | File | Description |
 |---|---|

@@ -52,6 +52,33 @@ Another slide.
 
 ---
 
+## Running the examples locally
+
+The `examples/` directory contains ready-to-run HTML files. They need a static server — opening them as `file://` URLs won't work.
+
+```bash
+# Clone and install
+git clone https://github.com/your-org/mdeck
+cd mdeck
+npm install
+
+# Start the dev server
+npm run dev
+```
+
+Then open any of these in your browser:
+
+| URL | Description |
+|---|---|
+| http://localhost:5173/examples/index.html | Quick demo with a default deck |
+| http://localhost:5173/examples/advanced.html | Custom CSS classes, markdown-it plugins, macros |
+| http://localhost:5173/examples/controls.html | All keyboard, mouse, and touch controls |
+| http://localhost:5173/examples/external.html | Load slides from an external `.md` file via `sourceUrl` |
+| http://localhost:5173/examples/inline-source.html | Pass Markdown directly via the `source` option |
+| http://localhost:5173/examples/remarkjs-compat.html | remark.js compatibility demo |
+
+---
+
 ## Documentation
 
 - [Getting started](docs/getting-started.md) — installation, ESM/UMD usage, `sourceUrl`, running examples, building from source
