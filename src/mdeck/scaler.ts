@@ -1,7 +1,6 @@
 import type EventEmitter from 'eventemitter3';
 import type { Slideshow } from './models/slideshow.js';
 
-const referenceWidth = 908;
 const referenceHeight = 681;
 
 interface Ratio { width: number; height: number; ratio: number }

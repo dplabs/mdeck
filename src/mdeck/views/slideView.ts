@@ -17,7 +17,7 @@ export class SlideView {
   originalBackgroundPosition?: string;
   private slideNumber: SlideNumber;
 
-  constructor(private events: EventEmitter, private slideshow: Slideshow, private scaler: Scaler, private slide: Slide) {
+  constructor(events: EventEmitter, private slideshow: Slideshow, private scaler: Scaler, private slide: Slide) {
     this.slideNumber = new SlideNumber(slide, slideshow);
     this.configureElements();
     this.updateDimensions();
