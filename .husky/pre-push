@@ -1,0 +1,22 @@
+branch=$(git rev-parse --abbrev-ref HEAD)
+pattern='^(main|master|develop|(feature|feat|bugfix|fix|hotfix|release|chore)\/[a-z0-9]+(\.[a-z0-9]+)*(-[a-z0-9]+(\.[a-z0-9]+)*)*)$'
+
+if ! echo "$branch" | grep -Eq "$pattern"; then
+  echo "✖ Invalid branch name: '$branch'"
+  echo ""
+  echo "  Branch names must follow the Conventional Branch spec:"
+  echo "  https://conventional-branch.github.io"
+  echo ""
+  echo "  Valid formats:"
+  echo "    main | master | develop"
+  echo "    feature/<desc>  feat/<desc>"
+  echo "    bugfix/<desc>   fix/<desc>"
+  echo "    hotfix/<desc>   release/<desc>"
+  echo "    chore/<desc>"
+  echo ""
+  echo "  Rules: lowercase, alphanumerics, hyphens and dots only."
+  echo "         No consecutive hyphens/dots, no leading/trailing hyphens/dots."
+  echo ""
+  echo "  Examples: feature/add-login  fix/issue-42  release/v1.2.0"
+  exit 1
+fi
