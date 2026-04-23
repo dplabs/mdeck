@@ -64,8 +64,13 @@ export function convertMarkdown(content: ContentItem[] | undefined, links: Recor
 
 /**
  * Like `convertMarkdown` but supports an optional async `renderer` callback.
- * When provided, the callback replaces `md.render()` — it receives the same raw markdown
- * string (per-slide) and must return HTML. Falls back to the built-in renderer on null or error.
+ * When provided, the callback is used to render raw markdown text chunks while block/inline
+ * CSS class structures (`.class[...]`) are handled structurally by mdeck itself.
+ * Falls back to the built-in renderer on null or error.
+ *
+ * Note: because `.class[...]` blocks are rendered independently, per-slide features
+ * that collect state across the whole markdown string (e.g. TOC, anchors) may not
+ * work correctly when mixed with CSS-class blocks on the same slide.
  */
 export async function convertMarkdownAsync(
   content: ContentItem[] | undefined,
@@ -75,18 +80,80 @@ export async function convertMarkdownAsync(
 ): Promise<string> {
   if (!content || content.length === 0) return '';
   const env = buildEnv(links);
-  // When a custom renderer is provided, collect the full raw markdown and pass it through,
-  // falling back to the built-in pipeline on null or error.
   if (renderer) {
-    const raw = buildRawMarkdown(content);
     try {
-      const result = await Promise.resolve(renderer(raw));
-      if (result != null) return postProcessHtml(result, inline);
+      const html = await renderContentWithRenderer(content, env, renderer);
+      return postProcessHtml(html, inline);
     } catch (err) {
       console.error('[mdeck] markdownRenderer failed, using built-in renderer', err);
     }
   }
   return postProcessHtml(renderContent(content, env), inline);
+}
+
+/**
+ * Async variant of `renderContent` that uses a custom renderer for raw markdown text chunks.
+ *
+ * Block CSS-class containers are handled structurally (rendered as `<div class="...">...</div>`).
+ * Inline CSS-class spans use a placeholder in the pending markdown so they remain inline in the
+ * paragraph flow. Their inner content is rendered through the custom renderer first (preserving
+ * markdown-in-spans support and security), then injected after the outer chunk is rendered.
+ */
+async function renderContentWithRenderer(
+  content: ContentItem[],
+  env: MdEnv,
+  renderer: (markdown: string) => string | null | Promise<string | null>,
+  _isRoot = true,
+): Promise<string> {
+  let html = '';
+  let pendingMarkdown = (_isRoot && env._linkDefs) ? env._linkDefs : '';
+  let spanPlaceholders: Array<{ placeholder: string; spanHtml: string }> = [];
+  let spanCount = 0;
+
+  const flushMarkdown = async () => {
+    if (pendingMarkdown) {
+      const chunk = pendingMarkdown;
+      const currentPlaceholders = [...spanPlaceholders];
+      pendingMarkdown = '';
+      spanPlaceholders = [];
+      let rendered: string;
+      try {
+        const result = await Promise.resolve(renderer(chunk));
+        rendered = result != null ? result : md.render(chunk, env);
+      } catch {
+        rendered = md.render(chunk, env);
+      }
+      for (const { placeholder, spanHtml } of currentPlaceholders) {
+        rendered = rendered.split(placeholder).join(spanHtml);
+      }
+      html += rendered;
+    }
+  };
+
+  for (const item of content) {
+    if (typeof item === 'string') {
+      pendingMarkdown += item;
+    } else if (item.block) {
+      await flushMarkdown();
+      const innerHtml = await renderContentWithRenderer(item.content, env, renderer, false);
+      html += `<div class="${item.class}">${innerHtml}</div>\n`;
+    } else {
+      // Inline span: use a placeholder so the span stays inline within the paragraph flow.
+      // The inner content is rendered through the custom renderer (for markdown support and
+      // security), then the outer <p> wrapper is stripped for inline use via postProcessHtml.
+      const placeholder = `MDECKSPAN${spanCount++}MDECKSPAN`;
+      const innerHtml = await renderContentWithRenderer(item.content, env, renderer, false);
+      const inlineInner = postProcessHtml(innerHtml, true);
+      spanPlaceholders.push({
+        placeholder,
+        spanHtml: `<span class="${item.class}">${inlineInner}</span>`,
+      });
+      pendingMarkdown += placeholder;
+    }
+  }
+
+  await flushMarkdown();
+  return html;
 }
 
 /** Apply mdeck's standard HTML post-processing (strip empty paragraphs, handle inline mode). */

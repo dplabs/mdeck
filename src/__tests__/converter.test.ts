@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { convertMarkdown } from '../mdeck/converter.js';
+import { convertMarkdown, convertMarkdownAsync } from '../mdeck/converter.js';
 
 type ContentItem = string | { block: boolean; class: string; content: ContentItem[] };
 
@@ -159,5 +159,88 @@ describe('convertMarkdown', () => {
       const html = convertMarkdown(['para\n\n- list'], {}, true);
       expect(html).toContain('<p>');
     });
+  });
+});
+
+describe('convertMarkdownAsync with custom renderer', () => {
+  // Simulates a renderer with html: false (like doqium's markdown-it).
+  // It HTML-escapes any tags in the input and wraps text in <p>.
+  const htmlOffRenderer = async (markdown: string): Promise<string> => {
+    const escaped = markdown
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;');
+    return `<p>${escaped.trim()}</p>`;
+  };
+
+  it('renders plain markdown through the custom renderer', async () => {
+    const html = await convertMarkdownAsync(['hello'], {}, false, htmlOffRenderer);
+    expect(html).toBe('<p>hello</p>');
+  });
+
+  it('renders block CSS class as <div> without passing HTML to renderer', async () => {
+    const content: ContentItem[] = [
+      { block: true, class: 'box red', content: ['Content here'] },
+    ];
+    const html = await convertMarkdownAsync(content, {}, false, htmlOffRenderer);
+    expect(html).toContain('<div class="box red">');
+    expect(html).toContain('<p>Content here</p>');
+    // The raw HTML div tag must NOT appear as escaped text
+    expect(html).not.toContain('&lt;div');
+  });
+
+  it('renders inline CSS class as <span> without escaping', async () => {
+    const content: ContentItem[] = [
+      { block: false, class: 'label', content: ['Problem'] },
+    ];
+    const html = await convertMarkdownAsync(content, {}, false, htmlOffRenderer);
+    expect(html).toContain('<span class="label">Problem</span>');
+    expect(html).not.toContain('&lt;span');
+  });
+
+  it('renders .box.red with nested .label inline span — the original failing case', async () => {
+    const content: ContentItem[] = [
+      {
+        block: true,
+        class: 'box red',
+        content: [
+          '\n  ',
+          { block: false, class: 'label', content: ['Problem'] },
+          '\n\n  Services are usually maintained by different teams.\n',
+        ],
+      },
+    ];
+    const html = await convertMarkdownAsync(content, {}, false, htmlOffRenderer);
+    expect(html).toContain('<div class="box red">');
+    expect(html).toContain('<span class="label">Problem</span>');
+    expect(html).toContain('Services are usually maintained by different teams.');
+    // No escaped HTML tags
+    expect(html).not.toContain('&lt;div');
+    expect(html).not.toContain('&lt;span');
+  });
+
+  it('falls back to built-in renderer when custom renderer returns null', async () => {
+    const nullRenderer = async (_markdown: string): Promise<null> => null;
+    const content: ContentItem[] = ['hello **world**'];
+    const html = await convertMarkdownAsync(content, {}, false, nullRenderer);
+    expect(html).toContain('<strong>world</strong>');
+  });
+
+  it('falls back to built-in renderer when custom renderer throws', async () => {
+    const throwingRenderer = async (_markdown: string): Promise<string> => {
+      throw new Error('renderer failed');
+    };
+    const content: ContentItem[] = ['hello **world**'];
+    const html = await convertMarkdownAsync(content, {}, false, throwingRenderer);
+    expect(html).toContain('<strong>world</strong>');
+  });
+
+  it('renders without custom renderer using built-in path', async () => {
+    const content: ContentItem[] = [
+      { block: true, class: 'left-column', content: ['## Heading\n'] },
+    ];
+    const html = await convertMarkdownAsync(content);
+    expect(html).toContain('<div class="left-column">');
+    expect(html).toContain('<h2>Heading</h2>');
   });
 });
