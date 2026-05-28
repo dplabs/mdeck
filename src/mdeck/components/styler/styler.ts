@@ -13,6 +13,18 @@ export const styler = {
     head.insertBefore(style, head.firstChild);
   },
 
+  injectUserStyles(css: string): void {
+    const id = 'mdeck-user-styles';
+    let style = document.getElementById(id) as HTMLStyleElement;
+    if (!style) {
+      style = document.createElement('style');
+      style.id = id;
+      style.type = 'text/css';
+      document.head.appendChild(style);
+    }
+    style.innerHTML = css;
+  },
+
   injectHighlightTheme(style: string): void {
     const id = 'mdeck-hljs-theme-' + style;
     if (document.getElementById(id)) return;

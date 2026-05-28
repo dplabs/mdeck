@@ -7,6 +7,7 @@ import { Scaler } from '../scaler.js';
 import { containerLayout } from '../resources.js';
 import { printing } from '../components/printing/printing.js';
 import { Timer } from '../components/timer/timer.js';
+import { styler } from '../components/styler/styler.js';
 import { getPrefixedProperty } from '../utils.js';
 
 export class SlideshowView {
@@ -148,6 +149,7 @@ export class SlideshowView {
   }
 
   updateSlideViews(): void {
+    styler.injectUserStyles(this.slideshow.getStyles());
     this.slideViews.forEach((sv) => this.elementArea.removeChild(sv.containerElement));
     this.slideViews = this.slideshow.getSlides().map((slide) => new SlideView(this.events, this.slideshow, this.scaler, slide));
     this.slideViews.forEach((sv) => this.elementArea.appendChild(sv.containerElement));

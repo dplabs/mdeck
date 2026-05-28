@@ -67,6 +67,7 @@ export class Slideshow {
   private _slidesByName: Record<string, Slide> = {};
   private _slidesByNumber: Record<number, Slide[]> = {};
   private _links: Record<string, { href: string; title?: string }> = {};
+  private _styles = '';
 
   constructor(private _events: EventEmitter, private _dom: Dom, private _options: SlideshowOptions, callback?: (slideshow: Slideshow) => void) {
     applyEvents(this, _events);
@@ -88,6 +89,7 @@ export class Slideshow {
 
   update(): void { this._events.emit('resize'); }
   getLinks() { return this._links; }
+  getStyles() { return this._styles; }
   getSlides(): Slide[] { return [...this._slides]; }
   getSlideCount(): number { return this._slides.length; }
   getSlideByName(name: string): Slide | undefined { return this._slidesByName[name]; }
@@ -120,8 +122,12 @@ export class Slideshow {
     this._slidesByNumber = byNumber;
     expandVariables(this._slides);
     this._links = {};
+    this._styles = '';
     this._slides.forEach((slide) => {
       Object.assign(this._links, slide.links);
+      if (slide.properties.styles) {
+        this._styles += slide.properties.styles + '\n';
+      }
     });
     this._events.emit('slidesChanged');
   }

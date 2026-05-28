@@ -85,6 +85,11 @@ describe('Slideshow', () => {
       expect(slideshow.getSlides()).toHaveLength(2);
     });
 
+    it('collects styles from slides', () => {
+      slideshow.loadFromString('<style>.red { color: red; }</style>\n# Slide 1');
+      expect(slideshow.getStyles()).toContain('.red { color: red; }');
+    });
+
     it('emits slidesChanged event', () => {
       const handler = vi.fn();
       events.on('slidesChanged', handler);

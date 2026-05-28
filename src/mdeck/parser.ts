@@ -86,7 +86,19 @@ export class Parser {
     slides.push(stack[0] as ParsedSlide);
 
     slides.forEach((slide) => {
-      slide.content[0] = extractProperties(slide.content[0] as string || '', slide.properties);
+      // Join all leading string items in content to ensure extractProperties sees the whole front-matter.
+      // The lexer might have split them if there were mixed indentation or other tokens.
+      let joinedContent = '';
+      let consumedCount = 0;
+      while (consumedCount < slide.content.length && typeof slide.content[consumedCount] === 'string') {
+        joinedContent += slide.content[consumedCount];
+        consumedCount++;
+      }
+
+      if (consumedCount > 0) {
+        const remaining = extractProperties(joinedContent, slide.properties);
+        slide.content.splice(0, consumedCount, remaining);
+      }
     });
 
     return slides.filter((slide) => {
@@ -126,27 +138,75 @@ function extractProperties(source: string, properties: Record<string, string>): 
   }
 
   // Extract plain `key: value` properties only from the leading front-matter block.
-  // Stop as soon as a line that is not a property (or blank) is encountered so that
-  // content lines like "Example: this disappears" are never consumed as properties.
+  // Stop as soon as a line that is not a property, a <style> block, or a blank line
+  // followed by one of those is encountered.
   const lines = source.split('\n');
-  const consumed: number[] = [];
-  const propertyLine = /^([-\w]+):([^$\n]*)$/i;
   let i = 0;
-  // Skip leading blank lines.
-  while (i < lines.length && lines[i].trim() === '') { i++; }
-  // Consume contiguous property lines.
+  let started = false;
+
   while (i < lines.length) {
     const line = lines[i];
-    if (line.trim() === '') break; // blank line ends the front-matter block
+    const lineTrim = line.trim();
+
+    if (lineTrim === '') {
+      if (started) {
+        // Look ahead: if the next non-blank line is a <style> block, continue.
+        // Otherwise, a blank line ends the front-matter block.
+        let j = i + 1;
+        while (j < lines.length && lines[j].trim() === '') j++;
+        if (j < lines.length && /^<style(?:\s+[^>]*)?>/i.test(lines[j].trim())) {
+          i = j;
+          continue;
+        }
+        break;
+      }
+      i++;
+      continue; // Leading blank lines are ignored.
+    }
+
+    // Try matching <style> block.
+    const styleBlockStart = /^<style(?:\s+[^>]*)?>/i;
+    if (styleBlockStart.test(lineTrim)) {
+      started = true;
+      let styleContent = '';
+      let j = i;
+      let foundClose = false;
+      while (j < lines.length) {
+        const currentLine = lines[j];
+        styleContent += currentLine + '\n';
+        const closeIndex = currentLine.toLowerCase().indexOf('</style>');
+        if (closeIndex !== -1) {
+          foundClose = true;
+          const match = /<style(?:\s+[^>]*)?>([\s\S]*?)<\/style>/i.exec(styleContent);
+          if (match) {
+            properties.styles = (properties.styles || '') + match[1];
+            const afterStyle = currentLine.slice(closeIndex + '</style>'.length);
+            lines[j] = afterStyle;
+            i = afterStyle.trim() === '' ? j + 1 : j;
+          } else {
+            i = j + 1;
+          }
+          break;
+        }
+        j++;
+      }
+      if (foundClose) continue;
+    }
+
+    // Try matching property line.
+    const propertyLine = /^([-\w]+):([^$\n]*)$/i;
     const m = propertyLine.exec(line);
-    if (!m) break; // non-property line ends the block
-    properties[m[1].trim()] = m[2].trim();
-    consumed.push(i);
-    i++;
+    if (m) {
+      started = true;
+      properties[m[1].trim()] = m[2].trim();
+      i++;
+      continue;
+    }
+
+    break;
   }
-  // Remove consumed lines from source.
-  const remaining = lines.filter((_, idx) => !consumed.includes(idx));
-  return remaining.join('\n');
+
+  return lines.slice(i).join('\n');
 }
 
 function cleanInput(source: string): string {
