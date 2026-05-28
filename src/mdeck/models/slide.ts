@@ -78,7 +78,17 @@ function inheritContent(slide: Slide, template: Slide) {
   deepCopyContent(slide, template.content);
   const expanded = slide.expandVariables(true);
   if (expanded.content === undefined) {
-    slide.content = slide.content.concat(slide.properties.content as unknown as ContentItem[]);
+    const slideContent = slide.properties.content as unknown as ContentItem[];
+    // Ensure newline separator between inherited template content and new slide content,
+    // otherwise markdown fragments run together and break list items, headings, etc.
+    if (slideContent.length > 0 && slide.content.length > 0) {
+      const last = slide.content[slide.content.length - 1];
+      const first = slideContent[0];
+      if (typeof last === 'string' && typeof first === 'string') {
+        slideContent[0] = '\n' + first;
+      }
+    }
+    slide.content = slide.content.concat(slideContent);
   }
   delete slide.properties.content;
 }
